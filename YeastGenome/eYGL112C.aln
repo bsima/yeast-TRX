@@ -1,0 +1,212 @@
+CLUSTAL W (1.82) multiple sequence alignment
+
+
+Scer            aataagaaactgcgagaccaccttcgctggcaagtagttgacccaactccatctttgtag
+Spar            atcaagaaacagcgagtccacttatactggcaagtgaccgcctgagctccatctttgtag
+Smik            ggcaaggaactataata--aatttctgaagtaagtttgtgacttagttcaatctttgtat
+Sbay            -----------------------acgacatcaattaagaacctgcagtcagcatttccta
+                                               ** *      *     **    ***    
+
+Scer            cttttcttggacgaaaagggaataaaataaaactaagctacaacaatttcgcacttcggg
+Spar            tatttttttgatggaatat-aatacaataaaactaagctgaatcaatttcatattttgaa
+Smik            ttttttttcagtgaaatgc-agtaaaa--aatcttagcaacgataatttcacattatgga
+Sbay            atgatttccattaaattgt------aacaaaattaaactgcatcgatttgactttttgga
+                    * *       *          **  **  * * *       ****     *  *  
+
+Scer            ggcc-tttgagtatacaattaaataa--ctcatcatgcatatatatatatatacatacaa
+Spar            ggcc-cttgagtgtacaattacgtaa--ctcaccatgcata--------tatacatacaa
+Smik            ggtc-cttgcatatataattacatat--ctcataacgaagat---------ggtatacaa
+Sbay            ggcctcttgcatacataattacacatgtcttatcacgtaaat--------acatatccca
+                ** *  ***  *  * *****   *   ** *  * * * *             ** * *
+
+Scer            tggcgtatgtaaaaactgttatataaca-ttaccgt---tgtactattagtataaaccga
+Spar            cggcgtatgcaaaa-ctgttatataaca-ttactgtagttgtactataagtataaaacga
+Smik            gagcatatgtatgaatagttgcataaca-gcatatttgttgtactattagtataaattag
+Sbay            aagtataggtatataacaatggataaaaattacaattattttactatttttccaaatcaa
+                  *  ** * *        *  **** *   *   *   * ******   *  ***    
+
+Scer            ttctcaC---------TATTCGCCAAAAAATATCGCACTAATTAATTCTTTTGCGTCGTC
+Spar            ttcttaC---------TATTCACCAAAAAAAATCGCGCTAATTAATTCTTTTGCATCATC
+Smik            ttcttgT---------TATTCACCAAAGAAAATCGCGCTGATCAATTCTTTTGCATCGTC
+Sbay            tcctttcaatccttcTCATTCGCCAAAGAAAATGGAGCTGATTAATTCTTTCGCATCATC
+                * **             **** ***** ** ** *  ** ** ******** ** ** **
+
+Scer            TCTTTTCAAAATGTGAAATCCAATAGTGACACCACACCTCTCTAGCAATTTTTCCTTATC
+Spar            CCTTTTCAAAATATGAAATCCAATGGTGACACCACACCTCTCTACCAATTTTTCCTTATC
+Smik            TCTTTCCAAAATATGATATCCAATAGTGACACCACACCTTTCTACTAATTTTTCCTTATC
+Sbay            TCTTTTCAAAATATGATACCCGATGGTGACACCGCACCTCTCTACCAGTTTTTCTTTATC
+                 **** ****** *** * ** ** ******** ***** ****  * ****** *****
+
+Scer            CTCATCCGTAACTTTTTCACCTTTACCCTCGTACAAATCTGGTAAATCCTTTTTTAGAAC
+Spar            CTCACCTGTAACTTTTTCACCTTTACCCTCGTACAAATCTGGTAAATCCTTTTTTAGAAC
+Smik            TTCGTCTGTAACTTTTTCTCCTTTACCCTGATACAAATCTGGCAAATCCTTTTTTAGAAC
+Sbay            TTCATCTGTGACTTCTTCACCTTTACCTTCGTATAAATCAGGCAGATCCTTCTTTAGAAC
+                 **  * ** **** *** ******** *  ** ***** ** * ****** ********
+
+Scer            TAACAATGCACTAATTACAGTATCAACCAAGATTTGAGTTTCTTCTTTAGTAAATTTGGT
+Spar            TAACAATGCGCTAATTACAGTATCAACCAAAATTTGAGTTTCTTCTTTGGTAAATTTAGT
+Smik            TAACAACGCACTAATTACAGTATCAACCAAAATGTGGGTCTCTTCTTTGGTAAATTTTGT
+Sbay            TAATAGTGCGCTAATGACAGTATCCACCAAAATTTGAGTCTCTTCTTTGGTAAATTTTGT
+                *** *  ** ***** ******** ***** ** ** ** ******** ******** **
+
+Scer            CCTAGTTGGATTGGAGTCATCGTTCAAATGTTCCTCTATATTGTCTAGAGTTATTCCGCT
+Spar            CCTTGTTGGATTGGCTTCATCGTTCAGATGTTCTTCTATATTTTCCAGCGTTATCCCGCT
+Smik            CCTTGACGAATTGTTTTCCTCCTTCAGATGTTCCTCTATGTTGTCCAGTGTTATCCCGCT
+Sbay            CCTAGTCGAATTCGCTTCATTGTTCAAATGCTCCTCTACATTTTCTAACGTTATACCAGT
+                *** *  * ***    ** *  **** *** ** ****  ** ** *  ***** **  *
+
+Scer            TTCATTGAATACCAAGCGCGCCCAATTATTTAGGTTTCCTAAGAAGAATCTGATGGATTC
+Spar            TTCATTGAATACCAAGCGCGCCCAATTATTTAGGTTTCCTAAGAAGAATCTGATAGATTC
+Smik            TTCATTAAACACTAAGCGCGCCCAATTACTTAAGTTACCCAAGAAAAATCTAATGGACTC
+Sbay            TTCATTGAACACTAAACGCGCCCAGTTATTTAGGTTACCTAAGAAAAACCTGATGGATTC
+                ****** ** ** ** ******** *** *** *** ** ***** ** ** ** ** **
+
+Scer            ACCTTCTAGTACCGATACACCCTTTAAGCACCCATAGTAAGTCCCAAAAACACGGTTTAT
+Spar            ACCCTCTAATACCGATACACCCTTTAAACATCCGTAGTAAGTCCCGAAAACACGGTTAAT
+Smik            ACCTTCTAGTACAGATACACCTTTTAAGCATCCATAATATGTCCCAAAAACACGGTTTAT
+Sbay            ACCTTCTAAGACTGATACACCTTTTAAACACCCATAATAAGTCCCAAAAACACGATTTAT
+                *** ****  ** ******** ***** ** ** ** ** ***** ******** ** **
+
+Scer            GTCCAAAAATGTCTTTAGCAGTGTCCTAGTTACTCTTGGCTTCAGGGATTTGTATGCTTG
+Spar            GTCCAAGAATGTTTTTAGCAATGTCCTAGTTACTCTTGGCTTCAAGGATTTATAAGCTTG
+Smik            GTCCAGGAACGTCTTCAGTAGTGTTCTAGTTACCCTTGGCTTCAAAGATTTATAAGCTTG
+Sbay            GTCCAGGAATGTCTTTAATAGTGTTCTGGTTACTCTTGGCTTCAATGATTTATAGGCTTG
+                *****  ** ** ** *  * *** ** ***** **********  ***** ** *****
+
+Scer            AGGAAATTTTTTCAATACATAGTCCAACAAAGATGCGGCAAAATCACGTAGTGCATTCGT
+Spar            AGGAAATTTTTTCAATACATAATCTAACAAAGATGCAGCAAAATCACGTAGTGCATTAGT
+Smik            AGGAAATTTTTTCAGCACATAATCCAATAGGGATGCAGCAAAATCACGTAATGCATTTGT
+Sbay            AGGGAATTTTTTCAATACGTAGTCTAGTAAAGATGCAGCAAAATCACGTAGTGCATTTGT
+                *** **********  ** ** ** *  *  ***** ************* ****** **
+
+Scer            TCTTTCTAAAAATTCATGAATTTCTTGCGGCGAATCATCTTTTGGTGATCCACCAAGTTT
+Spar            TCTTTCTAAAAATTCATGGATTTCTTGCGGCGAGTCATCTTTTGGTGATCCACCGAGCTT
+Smik            TCTCTCTAAGAACTCATGGATTTCTTGCGGCGAGTCATCTTTTGGTGATCCACCAAGCTT
+Sbay            TCTTTCCAAAAATTCATGAATTTCTTGCGGCGATTCATCTTTTGGTGATCCACCTAGTTT
+                *** ** ** ** ***** ************** ******************** ** **
+
+Scer            TTTTGCTAATAGCAAGGTTAAAATGGAAGGCATTAACGAATGAATATAAGGGTCCAGGAA
+Spar            CTTTGCTAATAGCAAGGTTAGAATGGAAGGCATTAGTGAGTGAATATAAGGGTCTAAGAA
+Smik            TTTCGCTAGCAGCAACGTTAGAATGGAAGGCATTAATGAATGAATATAAGGGTCTAAAAA
+Sbay            TTTAGCCAGGAGCAATGTTAGAATAGAGGGCATTAATGAATGAATGTAAGGGTCTAAGAA
+                 ** ** *  ***** **** *** ** *******  ** ***** ******** *  **
+
+Scer            AATAGAAGTATTGCTTAGTAAAGAGTAAATCATTTCCAAAATTGTTGTTAGCAATTGTAA
+Spar            GATAGAAGAATTGCTTAGTAAAGAGTAAATCATTTCCAAGATTGTTGTCAGTAGTTGCAA
+Smik            GATTGAAGAATTGCTCAGCAAAGAGTAAATCATTTCCAAAATTGTTGTCAGTAGTTGCAA
+Sbay            AATGGAGGAATTACTCAACAAAGAGTATATCATTTCTAAAATTGTCGTCAGTAGTTGCAA
+                 ** ** * *** ** *  ******** ******** ** ***** ** ** * *** **
+
+Scer            ATCGGAAAGATTTTGTGTGATTTGTTCGGCAATAAATTGAATAAAATATGGAACCAGTTG
+Spar            ATCAGAAAGGTTTTGCGTAATCTGTTCGGCAATGAATTGAATAAAATATGGAACCAGTTG
+Smik            GTCAGAAAGGTTTTGAGTAATTTGTTCCGCTATAAATTGAATAAAATACGGAACTAGTTG
+Sbay            ATCAGAAAGATTTTGGGTGATTTGTTCAGCAATAAACTGAATAAAATAAGGAACCAATTG
+                 ** ***** ***** ** ** ***** ** ** ** *********** ***** * ***
+
+Scer            GTGCAGGCCACTATCAGTTCGTAGTGAAGTCAAAGCTGCTTGTTTCATATGCTGTGCAGC
+Spar            GTGCAGGCCACTATCAGTCCTTAGTGAGGTCAAAGCTGCTTGTTTCATGTGCTGTGCACC
+Smik            GTGCAGGCCACTATCAGTCCTTAATGAGGTCAAAGCTGCTTGCTTCATATGTTGTACACT
+Sbay            GTGGAGACCACTATCGGTCTTCAAAGATGTCAAGGCTGCTTGCTTCATATGCTGCACGCT
+                *** ** ******** **    *  ** ***** ******** ***** ** **  *   
+
+Scer            TTCATCAGCTTGACTCTTCGCTGTCAAGGTTGAAATGACCTTATTGAAATAAATCTGTAA
+Spar            TTCATCGCCTTGGCTCTTCGCAGTCAAAGTTGAAATAACTTTATTGAAATAGATCTGTAA
+Smik            TTCATCAGCTTGGCTCTTCGCAGTCAACGTTGATATAACCTTGTTAAAATAAATCTGTAA
+Sbay            TTCATCGTTTTGATTCTTCGCGGTTAAAGTTGAAATGACCTTGTTAAAGTAGATTTGTAA
+                ******   ***  ******* ** ** ***** ** ** ** ** ** ** ** *****
+
+Scer            TTCTTTGGATAAAACGTGTTTCACTAAAGGTTTGACTTCAGTATTCTGTCCTGGTTTAAC
+Spar            TTCTTTGGACAAAACGTGTTTTACTAATGGTTTAACTTCAGTATTCTGACCTGGCTTAAC
+Smik            TTCTTTGGATAAAACATGCTTTACTAACGGTTTTACTTCAGTATTCTGTCCCGGTTTAAC
+Sbay            TTCTTTGGATAGGACATGTTTTACTAATGGTTTAACTTCAGTATTCTGCCCTGGTTTGAC
+                ********* *  ** ** ** ***** ***** ************** ** ** ** **
+
+Scer            ATTAGACAGGTGTTGAGAGGCGCCTGTATCCGTCACAGAAGCACTTGCTGTCGTCGACGT
+Spar            ATTAGACAGATGTTGAGAGGCGCCTGTATCCGTCACAGAAGCGCTTGCTGCCGTCGACGT
+Smik            ATTAGATAAATGTTGAGAGATGGCCGTATCCGCTACGGAAGCGCTTGCTGTCGTCGACGT
+Sbay            GTTAGACAGATGTTGAGAAGCGCTGGTATCCGTCACGGAAGCGTTTGCAGCCGATGAAGA
+                 ***** *  ********   *   *******  ** *****  **** * **  ** * 
+
+Scer            TACAGGTGTTTGGAGGCTGTTATCATTCAAAGCAGTGACAATAGCACCTCTAATAAATGG
+Spar            TACAGGTGTTTGGAGGCTGTTATCATTCAAAGCAGTGACAATAGCACCTCTAATAAATGG
+Smik            TGCAGGTGTTTGGAGGCTATTATCATTTAAAGCAGTGACAATGGCACCTCTAATAAATGG
+Sbay            TGCAGGAGTTTGAAAACTATTATCATTCAAAGCAGTAACAATAGCACCCCTAATAAATGG
+                * **** ***** *  ** ******** ******** ***** ***** ***********
+
+Scer            TGGTTGGGATACCCTTATATCATTCAAATTTGGATTTTGGATTATGGCAGGTTGAACCCC
+Spar            TGGTTGGGATACTCTTATATCATTCAAATTCGGATTTTGGATTATGGCAGGTTGGACACC
+Smik            TGGCTGAGATACCCTTATATCGTTCAAATTTGGATTTTGGATTATGGCAGGTTGAATACC
+Sbay            GGGTTGAGATACTCTTATATCATTCAAGTTTGGGTTTTGAATTATGGCAGGTTGAACACC
+                 ** ** ***** ******** ***** ** ** ***** ************** *  **
+
+Scer            TTCAACTGCTAGCCAATGTGTAGTAAAAGTTGGTAGACGAGGCACTTGCGGTAATGGCTC
+Spar            CTCAACAGCTAGCCAGTGTGTAGTAAAAGTTGGCAAACGGGGCACTTGCGGTAATGGCTC
+Smik            CTCAACAGCAAGCCAGTGCGTAGTAAATGTTGGTAAACGAGGCACTTGAGGTAATGGCTC
+Sbay            TTCAACAGCGAGCCAGTGTGTTGTAAACGTTGGTAGACGGGGAACTTGCGGTAATGGCTC
+                 ***** ** ***** ** ** ***** ***** * *** ** ***** ***********
+
+Scer            ATTTATTAATCTATCAAAATCTACTTCTTCCTCATCCAGGTAGTAAACCGACTGTCCTCC
+Spar            ATTTATCAATCTATCGAAGTCCACCTCTTCCTCATCCAGGTAATAAACTGACTGTCCTCC
+Smik            ATTTATTAGTCTATCAAAGTCAACTTCTTCTTCGTCCAAATAATAGACTGACTGTCCTCC
+Sbay            ATTTATTAGTTTATCGAAATCCACCTCTTCTTCATCTAAGTAATAGATCGACTGTCCTCC
+                ****** * * **** ** ** ** ***** ** ** *  ** ** *  ***********
+
+Scer            ACTTGTGTTAACCTTACTAAATGATACAGCTTTATTAACTTCAGAGCCATCATAATATCC
+Spar            AGTTGTGTTAACCTTGCTAAATGATACAGCTTTATTAACCTCAGAGCCATCATAATACCC
+Smik            CGATGTATTAACTTTACTAAATGACACAGCTTTATTAACCTCAGAGCCATCGTAGTACCC
+Sbay            GGATGTATTGACTTTACTAAATGATACAGCTCTATTAACCTCTGAGCCGTCATAATACCC
+                   *** ** ** ** ******** ****** ******* ** ***** ** ** ** **
+
+Scer            ATATAAAGGTTCCACATTCAGAACACGCAGGGCCTTCGATACATCGTCTGTAGTTAAAAC
+Spar            ATATAAAGGTTCCACATTCAAAACACGCAGCGCCTTCGATACGTCATCTGTAGTTAAAAC
+Smik            ATATAGAGGTTCCACATTCAATACACGTAGCGCCTTTGACACATCATCAGTGGTTAACAC
+Sbay            ATATAAAGGTTCCACGTTCAAAACACGCAGCGCCTTCGATACATCATCTGTAGTCAGCAC
+                ***** ********* ****  ***** ** ***** ** ** ** ** ** ** *  **
+
+Scer            ATCTCTTTTAGAGTGTCTTTTAAACTTGACTGCCTGTTCAATAATCTCTAGAATACGGTA
+Spar            ATCCCTTTTGGAGTGCCTCTTGAACTTGACTGCCTGTTCAATGATCTCTAGAATACGGTA
+Smik            ATCTCTTTTAGAATGCCTCTTGAACTTAACGGCCTGTTCGATAATCTCTAGAATGCGGTA
+Sbay            ATCCCTTTTAGAGTGTCTTTTAAATTTAACGGCCTGTTCAATAATCTCCAGAATACGGTA
+                *** ***** ** ** ** ** ** ** ** ******** ** ***** ***** *****
+
+Scer            TTCAACGTCCATAGCAAGTGCTTTCAACACGTCATCGTTGATATTTTCCAACCCAAGCGA
+Spar            TTCAACGTCCATAGCAAGTGCTTTCAAGACATCATCGTTAATATTTTCTAACCCGAGTGA
+Smik            TTCCACATCCATAGCAAGTGCTTTCAAAACGTCATCATTAATATTTTCTAATCCAAGAGA
+Sbay            TTCCACATCCATGGCAAGTGCCTTCAAGACATCATCATTGATATTTTCTAACCCAAGCGA
+                *** ** ***** ******** ***** ** ***** ** ******** ** ** ** **
+
+Scer            CTCAGCGACATCTTTAACAGTATCTTGTGGAGACCAAATTGTGTAAGATTGCTGCTGTGT
+Spar            CTCAGCGACATCTTTGACAGTATCTTGTGGAGACCAAATTGTGTATGATTGCTGCTGTGT
+Smik            CTCAGCGACATCTTTGACAGTATCCTGTGGAGACCAAATTGTGTATGATTGTTGCTGCGT
+Sbay            TTCGGCGACATCCTTCACGGTGTCTTGTGGAGACCAAATTGTGTATGACTGCTGTTGTGT
+                 ** ******** ** ** ** ** ******************** ** ** ** ** **
+
+Scer            AGACATtttaacaggctatcaactacactgaggcgtc-ctttgcttcctttttaaagcca
+Spar            AGACATtttaaccggctgtcaattgcactgaggcgtttctttacttcttttttgagttta
+Smik            AGACATttcaaccgtccgtcaatggcactaacaagtttctttatctctttttt-agtcta
+Sbay            GGACATtttaaccagtcgttagttacactgagacgcttcttcaactcgactcctaaagtg
+                 ******* ***      * *    **** *   *   ***    **   *   *     
+
+Scer            atctattgttttcgctcatgaactacttttgctgctacttgaatcggtgtttgttattga
+Spar            aactactgttttcgcttatgaactacttttactgctacttgaggtggtgtttcttattga
+Smik            atatactactttcgcttataaactgcttttgttgttacttgaattgatgttacttgtaga
+Sbay            at-tattgccttaaccttcgaactacttttgctgttattcgaattgatgtttcttattta
+                *  ** *   **  *     **** *****  ** ** * **   * ****  ** *  *
+
+Scer            tggtttccgggtat-ttttttggtaataaaataaagctgaaaaattttgtaaagcgatgc
+Spar            tggtatccgggtac-ttttttggtgataaaacaaagttgaaaaattttg-aaagcgatgc
+Smik            tg-catccgggtat-tttttggacaatgaaacaaagttgaaaaattttg-aaagcgatgc
+Sbay            gtttttccgggtatctttttaggcgatacagtaac-ttgaaaaattttg-aaagcgatgc
+                     ********  ***** *   **  *  **   ************ **********
+
+Scer            cca-atctcgaagcctcacttcaatgaacataatacagaga-aaatttaaccataaatag
+Spar            cca-atctcgaggcatcacttcaatgaacacaatacagaga-aaaaagaaccataaatag
+Smik            cca-aggtagaagcatcacttcaataaaaatacaataggga-ataaa-aaccattaaaaa
+Sbay            ccatatctcgaagcatcattttgatgagtatcatatagagttgaaataaacaataaatag
+                *** *  * ** ** *** **  ** *  *    * ** *    *   *** ** ** * 
+
+Scer            gcccagcttcgatcgtaaa
+Spar            -cctaacttggatcgtaaa
+Smik            aaccaagttggaccacaaa
+Sbay            ctctaggttgaaacacacg
+                  * *  **  * *  *  

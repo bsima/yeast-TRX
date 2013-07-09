@@ -5,33 +5,66 @@ use strict;
 use warnings;
 use diagnostics;
 
-use File::Copy;
+#use File::Copy;
 
+# Var matey!
 my @dirFiles = glob "./src2/*";
+my $scer = qr/Scer\s{12}([atgcATGC-]{1,})/;
+my $spar = qr/Spar\s{12}([atgcATGC-]{1,})/;
+my $smik = qr/Smik\s{12}([atgcATGC-]{1,})/;
+my $sbay = qr/Sbay\s{12}([atgcATGC-]{1,})/;
+my $crickRegex = qr/.{1,}C.aln/;
+
+my %Saccharomyces = (
+	'cerevisiae' => qr/Scer\s{12}([atgcATGC-]{1,})/,
+	'paradoxus'  => qr/Spar\s{12}([atgcATGC-]{1,})/,
+    'martinae'   => qr/Smik\s{12}([atgcATGC-]{1,})/,
+	'bayanus'    => qr/Sbay\s{12}([atgcATGC-]{1,})/
+);	
+	
 
 foreach my $fileName (@dirFiles) {
-		
+
     # First, open each file.	
 	open(FILE, $fileName) || die "Cannot open file: $!";
 	
-	# For each line of the file, extract the genetic code for Scer	
-	while ( my $line = <FILE> ) {	
-	
-		# Extract the genetic code using my super awesome match sub	
-		my $scer = qr/Scer\s{12}([atgcATGC-]{1,})/;
-		$line = match($scer,$line);
-		print "Match\n";
-		print $line . "\n";
+	my @text = <FILE>;
 
-		# If it's a Crick file, we have to reverseCompliment it
-		if ( $fileName =~ /.{1,}(C.aln)/ ) {
-			$line = reverseCompliment($line);
-			print $fileName . " is a Crick File! Line reversed\n";
-			#print $line . "\n";
-		};
-		
-	};
-		
+	# For each line of the file, extract the genetic code (using my awesome match sub)
+	foreach my $line (@text) {
+
+		# Lets cycle through each species
+		foreach my $species (keys %Saccharomyces) {
+			my $regex = $Saccharomyces{$species};
+
+			if ( match($regex,$line) ) {
+				# If we've found a match, extract the data and assign it to the $line variable
+				$line = match($regex,$line);
+			
+				# Don't forget to reverseCompliment the Crick files!
+				if ( $fileName =~ $crickRegex ) {
+					$line = reverseCompliment($line);
+				}
+
+				# Now let's do something with the raw data...
+				# --------------------------------------------
+				# We need to separate each species. Then we can input the raw data from
+				# each into an R data table and run the TRX calculation separately on
+				# each species.
+				#
+				# I think the way to do this is to generate a temporary R script for each
+				# respective species that passess the $species variable to the script as
+				# the key for the data. The genetic data should all be stored together.
+			
+			
+			
+				print $species . ": " . $line . "\n";
+
+				
+			} 
+		}
+	}
+
 	close FILE;
 };
 
@@ -41,22 +74,16 @@ sub match {
 
 	my $re = $_[0];
 	my $text = $_[1];
-	
-	# Let's do some error checking
-	# if ( defined($re) ) { print "Regular expression is " . $re . "\n"; } else { print "Regular expression not defined.\n"; }
-	# if ( defined($text) ) { print "Text is " . $text . "\n"; } else { print "Text is not defined.\n"; }	
 
 	if ( $text =~ $re ) {
 		return $1;
 	} else {
 		return $1;
-		print "No match.\n";
 	}
 }
 
 # @name reverseCompliment
 # @description Given a string of text of coded DNA, this outputs the reverse compliment of the strand.
-# @TODO Right now this can only handle one string at a time. I wonder if it would be worth it to make it handle various types of input...?
 sub reverseCompliment {
 
 	# Get DNA to work on
@@ -66,7 +93,7 @@ sub reverseCompliment {
 	$dna = reverse $dna;
 
 	# Now translate the DNA
-	$dna =~ tr/ACGTacgt/TGCAtgca/;
+	$dna =~ tr/ACGTacgt-/TGCAtgca-/;
 
 	# Return the output
 	return $dna;

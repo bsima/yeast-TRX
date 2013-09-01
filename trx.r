@@ -5,10 +5,7 @@
 # each species.
 #
 # I think the way to do this is to generate a temporary R script for each
-# respective species that passess the $species variable to the script as
-# the key for the data. The genetic data should all be stored together.
-#
-# First I will just pass it to R and calculate the average, then figure
-# out the TRX calculation later.
-
-	
+# respective species that creates a separate data frame of the TRX sequences
+# associated with that species. Then, each R script can be run from the main
+# script.pl. We could even pass each species' R script to trx.r, thus
+# calculating the TRX values and drawing the necessary graphs concurrently.

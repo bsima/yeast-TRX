@@ -8,7 +8,7 @@ use diagnostics;
 #use File::Copy;
 
 # Var matey!
-my @dirFiles = glob "./src2/*";
+my @dirFiles = glob "./YeastGenome/*";
 my $crickRegex = qr/.{1,}C.aln/;
 my %Saccharomyces = (
 	'cerevisiae' => qr/Scer\s{12}([atgcATGC-]{1,})/,

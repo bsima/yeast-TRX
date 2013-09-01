@@ -21,7 +21,14 @@ my %Saccharomyces = (
     'martinae'   => qr/Smik\s{12}([atgcATGC-]{1,})/,
 	'bayanus'    => qr/Sbay\s{12}([atgcATGC-]{1,})/
 );	
-	
+
+# Start building the R script
+open(RSCRIPT, ">>rscript.r");
+
+# First create a NULL vector for each species to store the data
+for (keys %Saccharomyces) {
+	print RSCRIPT $_ . "<-c()\n";
+}
 
 foreach my $fileName (@dirFiles) {
 
@@ -34,8 +41,8 @@ foreach my $fileName (@dirFiles) {
 	foreach my $line (@text) {
 
 		# Lets cycle through each species
-		foreach my $species (keys %Saccharomyces) {
-			my $regex = $Saccharomyces{$species};
+		for (keys %Saccharomyces) {
+			my $regex = $Saccharomyces{$_};
 
 			if ( match($regex,$line) ) {
 				# If we've found a match, extract the data and assign it to the $line variable
@@ -49,24 +56,27 @@ foreach my $fileName (@dirFiles) {
 				# Now let's do something with the raw data...
 				# --------------------------------------------
 				# We need to separate each species. Then we can input the raw data from
-				# each into an R data table and run the TRX calculation separately on
+				# each into an R data frame and run the TRX calculation separately on
 				# each species.
 				#
 				# I think the way to do this is to generate a temporary R script for each
 				# respective species that passess the $species variable to the script as
 				# the key for the data. The genetic data should all be stored together.
-			
-			
-			
-				print $species . ": " . $line . "\n";
-
-				
+				#
+				# First I will just pass it to R and calculate the average, then figure
+				# out the TRX calculation later.
+	
+				# First create a NULL vector for each species to store the data
+				# Now append the data to each specie's respective vectors 
+				print RSCRIPT $_ . "<-append(" . $_ . ",\"" . $line . "\")\n";			
 			} 
 		}
 	}
-
 	close FILE;
 };
+
+close RSCRIPT;
+
 
 # @name match
 # @description Matches a given text to a regular expression. First pass the regular expression, then the text as params. Returns the matched text.

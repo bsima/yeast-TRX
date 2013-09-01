@@ -9,12 +9,7 @@ use diagnostics;
 
 # Var matey!
 my @dirFiles = glob "./src2/*";
-my $scer = qr/Scer\s{12}([atgcATGC-]{1,})/;
-my $spar = qr/Spar\s{12}([atgcATGC-]{1,})/;
-my $smik = qr/Smik\s{12}([atgcATGC-]{1,})/;
-my $sbay = qr/Sbay\s{12}([atgcATGC-]{1,})/;
 my $crickRegex = qr/.{1,}C.aln/;
-
 my %Saccharomyces = (
 	'cerevisiae' => qr/Scer\s{12}([atgcATGC-]{1,})/,
 	'paradoxus'  => qr/Spar\s{12}([atgcATGC-]{1,})/,
@@ -22,12 +17,12 @@ my %Saccharomyces = (
 	'bayanus'    => qr/Sbay\s{12}([atgcATGC-]{1,})/
 );	
 
-# Start building the R script
-open(RSCRIPT, ">>rscript.r");
+# Start building the R script to make the data frame
+open(DATA, ">>dataframe.r");
 
 # First create a NULL vector for each species to store the data
 for (keys %Saccharomyces) {
-	print RSCRIPT $_ . "<-c()\n";
+	print DATA $_ . "<-c()\n";
 }
 
 foreach my $fileName (@dirFiles) {
@@ -53,29 +48,17 @@ foreach my $fileName (@dirFiles) {
 					$line = reverseCompliment($line);
 				}
 
-				# Now let's do something with the raw data...
-				# --------------------------------------------
-				# We need to separate each species. Then we can input the raw data from
-				# each into an R data frame and run the TRX calculation separately on
-				# each species.
-				#
-				# I think the way to do this is to generate a temporary R script for each
-				# respective species that passess the $species variable to the script as
-				# the key for the data. The genetic data should all be stored together.
-				#
-				# First I will just pass it to R and calculate the average, then figure
-				# out the TRX calculation later.
-	
-				# First create a NULL vector for each species to store the data
 				# Now append the data to each specie's respective vectors 
-				print RSCRIPT $_ . "<-append(" . $_ . ",\"" . $line . "\")\n";			
+				print DATA $_ . "<-append(" . $_ . ",\"" . $line . "\")\n";			
 			} 
 		}
 	}
 	close FILE;
 };
 
-close RSCRIPT;
+# Finally, combine all of the species vectors into one data frame
+# print DATA 
+close DATA; 
 
 
 # @name match

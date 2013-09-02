@@ -34,8 +34,6 @@ my %trxSequences = (
 my $trxData   = "trxData.r";
 my $geneRe  = qr/\/([\d|\w]+)\.[\d|\w]+/;
 
-
-
 print "\nInitializing...\n\n";
 
 # This creates a separate CSV file for each species
@@ -45,6 +43,11 @@ foreach (keys %Saccharomyces) {
 	print FILE "Saccharomyces $_\n";
 	print FILE "gene,code\n";
 	close FILE;
+
+    open(TRXSCORE,">$_-TRXscore.csv");
+    print TRXSCORE "Saccharomyces $_\n";
+    print TRXSCORE "gene,gene pair,position,trx score\n";
+    close TRXSCORE;
 }
 
 print "Currently writing data\n";
@@ -67,7 +70,7 @@ foreach my $fileName (@yeastGenome) {
 		foreach my $species (keys %Saccharomyces) {
 
 			# Load the regex for the species from the hash into $regex
-			my $regex   = $Saccharomyces{$species};
+			my $regex = $Saccharomyces{$species};
 
 			if ( match($regex,$line) ) {
 				# If the line from the data file matches the species we 
@@ -86,56 +89,41 @@ foreach my $fileName (@yeastGenome) {
 				# Report the data to the respective CSV file in the
 				# following format:
 				# 		gene,code	
-				open(FILE, ">>$species.csv");
+				open(FILE, ">>$species.csv") || die "Cannot open file: $!";
 				print FILE $geneName . "," . $line . "\n";
 				close FILE;
 
-				# Not done yet... We have to run the TRX matches now
-				# We cycle through each $sequence in the %trxSequences hash.
-				# If a match is found, we print it to TRXDATA in a format ready
-				# to run as an R script that creates a data frame.
-				#foreach my $sequence (keys %trxSequences) {
-				#	if ( match($trxSequences{$sequence},$line) ) {
-				#		my $trxLine = match($trxSequences{$sequence},$line);
-				#		print TRXDATA $species . "<-append(" . $sequence . ",\"" . $trxLine . "\")\n";
-				#	}
-				#}
-			} 
+                # While I still have the $line of code to work with,
+                # I might as well loop through the letters and 
+                # calculate the TRX values
+                #
+                # Print the data to the respective CSV file in the
+                # following format:
+                #       gene,gene pair,position,trx score
+                open(TRXSCORE, ">>$species-TRXscore.csv") || die "Cannot open file: $!";
+                for ( my $position = 0; $position < length($line); $position++ ) {
+                    my $dinucleotide = substr($line,$position,2); 
+                    if ( length($dinucleotide) == 2 ) {     
+                        my $trxValue = trxScore($dinucleotide);
+                        print TRXSCORE $geneName . "," . $dinucleotide . "," . $position . "," . $trxValue . "\n";
+                    }
+                }
+                close TRXSCORE;
+
+		    } 
 		}
 	}
 	close FILE;
 };
 
-print "\nData has been written to CSV files.\n"; 
+print "\nData has been written to CSV files,\nand TRX Score has been calculated.";
 
-foreach (keys %Saccharomyces) {
-	
-	# First, open the respective file
-	# Second, note the position on the genome -> $position
-	# 		Probably use a while loop and an increasing $i var
-	# 		Just make sure to record this into the resultant file with the TRX value
-	# Third, calculate the TRX value and write to a new file
-	# Fourth, move on to the next position
-	# Finally, close the file
-	open(FILE,"<$_.csv");
-
-	my @text = <FILE>;
-
-	foreach my $line (@text) {
-		
-	}	
-
-};
-
-# ##################################################################################################
-# Now we have a file, $trxData, that, when run as an R script via source() function, will (sort of) 
-# create a data frame of all the matched TRX sequences. With some editing (i.e. better R scripting),
-# we could easily pair the matched TRX sequence with the species. Then, an R script could calculate
-# the TRX values for each sequence in each species. Said R script will be trx.r
-# ##################################################################################################
 
 # @name match
 # @description Matches a given text to a regular expression. First pass the regular expression, then the text as params. Returns the matched text.
+# @param $re {string} Regular expression
+# @param $text {string} Text to be run against the regular expression
+# @return {string} The matched text
 sub match {
 
 	my ( $re, $text ) = @_;
@@ -147,6 +135,8 @@ sub match {
 
 # @name reverseCompliment
 # @description Given a string of text of coded DNA, this outputs the reverse compliment of the strand.
+# @param $dna {string} DNA string to be reversed
+# @return {string} Reversed DNA
 sub reverseCompliment {
 
 	# Get DNA to work on
@@ -163,29 +153,44 @@ sub reverseCompliment {
 }
 
 # @name trxScore
-# @description Calculates the TRX value of a given phosphate linkage
+# @description Calculates and returns the TRX value of a given phosphate linkage
+# @param $dinucleotide {string} The nucleotide to be checked
+# @return {integer} The TRX value
 sub trxScore {
+   
+    my ( $dinucleotide ) = @_;
 
+    # @TODO Find the paper where I got these scores from... Can't remember 
 	my %trxScores = (
-		'CpG' => 43,
-		'CpA' => 42,
-		'TpG' => 42,
-		'GpG' => 42,
-		'CpC' => 42,
-		'GpC' => 25,
-		'GpA' => 22,
-		'TpC' => 22,
-		'TpA' => 14,
-		'ApG' =>  9,
-		'CpT' =>  9,
-		'ApA' =>  5,
-		'TpT' =>  5,
-		'ApC' =>  4,
-		'GpT' =>  4,
-		'ApT' =>  0
+		qr/(CG)/ => 43,
+		qr/(CA)/ => 42,
+		qr/(TG)/ => 42,
+		qr/(GG)/ => 42,
+		qr/(CC)/ => 42,
+		qr/(GC)/ => 25,
+		qr/(GA)/ => 22,
+		qr/(TC)/ => 22,
+		qr/(TA)/ => 14,
+		qr/(AG)/ =>  9,
+		qr/(CT)/ =>  9,
+		qr/(AA)/ =>  5,
+		qr/(TT)/ =>  5,
+		qr/(AC)/ =>  4,
+		qr/(GT)/ =>  4,
+		qr/(AT)/ =>  0
 	);
 
-	
+    foreach my $re (keys %trxScores) {
+        if ( match($re,$dinucleotide) ) {
+            return $trxScores{$re};
+        } else {
+            return "null";
+        }
+    }
+}
 
-
+# @name position
+# @description A loop that updates and returns the current position on the genome
+sub position {
+    
 }

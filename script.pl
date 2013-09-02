@@ -1,7 +1,5 @@
 #! /usr/bin/perl
 # 
-# @TODO Make the loop also count line numbers for *-TRXscore.csv files
-
 use strict;
 use warnings;
 use diagnostics;
@@ -31,6 +29,7 @@ my %trxSequences = (
 );
 my $trxData   = "trxData.r";
 my $geneRe  = qr/\/([\d|\w]+)\.[\d|\w]+/;
+my $lineNumber = 0;
 
 print "\nInitializing...\n\n";
 
@@ -44,7 +43,7 @@ foreach (keys %Saccharomyces) {
 
     open(TRXSCORE,">$_-TRXscore.csv");
     print TRXSCORE "Saccharomyces $_\n";
-    print TRXSCORE "gene,gene pair,position,trx score\n";
+    print TRXSCORE "gene,dinucleotide,line number,position,trx score\n";
     close TRXSCORE;
 }
 
@@ -63,8 +62,11 @@ foreach my $fileName (@yeastGenome) {
 
 	# For each line of the file, extract the genetic code (using my awesome match sub)
 	foreach my $line (@text) {
-
-		# Lets cycle through each species
+        
+        # Track the line I'm reading
+        $lineNumber++;
+		
+        # Lets cycle through each species
 		foreach my $species (keys %Saccharomyces) {
 
 			# Load the regex for the species from the hash into $regex
@@ -97,13 +99,13 @@ foreach my $fileName (@yeastGenome) {
                 #
                 # Print the data to the respective CSV file in the
                 # following format:
-                #       gene,gene pair,position,trx score
+                #       gene,dinucleotide,line number,position,trx score
                 open(TRXSCORE, ">>$species-TRXscore.csv") || die "Cannot open file: $!";
                 for ( my $position = 0; $position < length($line); $position++ ) {
                     my $dinucleotide = substr($line,$position,2); 
                     if ( length($dinucleotide) == 2 ) {     
                         my $trxValue = trxScore($dinucleotide);
-                        print TRXSCORE $geneName . "," . $dinucleotide . "," . $position . "," . $trxValue . "\n";
+                        print TRXSCORE $geneName . "," . $dinucleotide . "," . $lineNumber . "," . $position . "," . $trxValue . "\n";
                     }
                 }
                 close TRXSCORE;
@@ -111,6 +113,9 @@ foreach my $fileName (@yeastGenome) {
 		    } 
 		}
 	}
+    
+    # Reset $lineNumber counter
+    $lineNumber = 0;
 	close FILE;
 };
 
@@ -181,10 +186,9 @@ sub trxScore {
     foreach my $re (keys %trxScores) {
         if ( match($re,$dinucleotide) ) {
             return $trxScores{$re};
-        } else {
-            return "null";
-        }
+        } 
     }
+     return "null";
 }
 
 # @name position

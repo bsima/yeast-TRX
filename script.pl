@@ -11,7 +11,7 @@ use diagnostics;
 #use File::Copy;
 
 # Var matey!
-my @yeastGenome = glob "./YeastGenome/*";
+my @yeastGenome = glob "./YeastGenome-tmp/*";
 my $isItCrick   = qr/.{1,}C.aln/;
 my %Saccharomyces = (
 	'cerevisiae' => qr/Scer\s{12}([atgcATGC-]{1,})/,
@@ -35,17 +35,14 @@ my $trxData   = "trxData.r";
 
 print "\nInitializing...\n\n";
 
-# Start building the R script to make the TRX data frame
-open(TRXDATA, ">>$trxData") || die "Cannot open file: $!";
-
-# First create a NULL vector for each species so we
-# can append the data later
+# This creates a separate CSV file for each species
 foreach (keys %Saccharomyces) {
-	print TRXDATA $_ . "<-c()\n";
+	open(FILE, ">", "$_.csv");
+	close FILE;
 }
 
-print "Currently writing data to $trxData\n";
-print "------------------------------------\n\n";
+print "Currently writing data\n";
+print "----------------------\n\n";
 
 # We're gonna have to run the operation for each
 # file in the YeastGenome
@@ -76,27 +73,29 @@ foreach my $fileName (@yeastGenome) {
 				if ( $fileName =~ $isItCrick ) {
 					$line = reverseCompliment($line);
 				}
+				
+				open(FILE, ">>$species.csv");
+				print FILE $line;
+				close FILE;
 
 				# Not done yet... We have to run the TRX matches now
 				# We cycle through each $sequence in the %trxSequences hash.
 				# If a match is found, we print it to TRXDATA in a format ready
 				# to run as an R script that creates a data frame.
-				foreach my $sequence (keys %trxSequences) {
-					if ( match($trxSequences{$sequence},$line) ) {
-						my $trxLine = match($trxSequences{$sequence},$line);
-						print TRXDATA $species . "<-append(" . $sequence . ",\"" . $trxLine . "\")\n";
-					}
-				}
+				#foreach my $sequence (keys %trxSequences) {
+				#	if ( match($trxSequences{$sequence},$line) ) {
+				#		my $trxLine = match($trxSequences{$sequence},$line);
+				#		print TRXDATA $species . "<-append(" . $sequence . ",\"" . $trxLine . "\")\n";
+				#	}
+				#}
 			} 
 		}
 	}
 	close FILE;
 };
 
-# Finally, combine all of the species vectors into one data frame
-# I don't know how to do this... 
-close TRXDATA;
-print "\nData has been written to $trxData.\n"; 
+print "\nData has been written to CSV files.\n"; 
+
 
 # ##################################################################################################
 # Now we have a file, $trxData, that, when run as an R script via source() function, will (sort of) 
@@ -131,4 +130,31 @@ sub reverseCompliment {
 
 	# Return the output
 	return $dna;
+}
+
+# @name trxScore
+# @description Calculates the TRX value of a given phosphate linkage
+sub trxScore {
+
+	my %trxScores = (
+		'CpG' => 43,
+		'CpA' => 42,
+		'TpG' => 42,
+		'GpG' => 42,
+		'CpC' => 42,
+		'GpC' => 25,
+		'GpA' => 22,
+		'TpC' => 22,
+		'TpA' => 14,
+		'ApG' =>  9,
+		'CpT' =>  9,
+		'ApA' =>  5,
+		'TpT' =>  5,
+		'ApC' =>  4,
+		'GpT' =>  4,
+		'ApT' =>  0
+	);
+
+
+
 }

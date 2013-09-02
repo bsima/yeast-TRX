@@ -1,8 +1,6 @@
 #! /usr/bin/perl
 # 
-# @TODO Modify $trxData to create the proper data frame that we need
-# @TODO Put $trxData into a tmp folder for deletion after it's run in R
-# @TODO Write the trx.r script
+# @TODO Make the loop also count line numbers for *-TRXscore.csv files
 
 use strict;
 use warnings;

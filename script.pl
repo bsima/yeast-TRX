@@ -32,6 +32,9 @@ my %trxSequences = (
 	'ApTApT' => qr/(AT.{1,}AT)/
 );
 my $trxData   = "trxData.r";
+my $geneRe  = qr/\/([\d|\w]+)\.[\d|\w]+/;
+
+
 
 print "\nInitializing...\n\n";
 
@@ -39,8 +42,8 @@ print "\nInitializing...\n\n";
 # and prints a header line with the species name
 foreach (keys %Saccharomyces) {
 	open(FILE, ">", "$_.csv");
-	print "Saccharomyces $_\n";
-	print "gene,line number,code\n";
+	print FILE "Saccharomyces $_\n";
+	print FILE "gene,code\n";
 	close FILE;
 }
 
@@ -76,12 +79,15 @@ foreach my $fileName (@yeastGenome) {
 				if ( $fileName =~ $isItCrick ) {
 					$line = reverseCompliment($line);
 				}
-			
+				
+				# Get the specific gene name from the $fileName
+				my $geneName = match($geneRe,$fileName);
+
 				# Report the data to the respective CSV file in the
 				# following format:
 				# 		gene,code	
 				open(FILE, ">>$species.csv");
-				print FILE $fileName . "," . $line . "\n";
+				print FILE $geneName . "," . $line . "\n";
 				close FILE;
 
 				# Not done yet... We have to run the TRX matches now

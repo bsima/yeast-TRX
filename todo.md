@@ -19,3 +19,9 @@ With each file, I need to do two things:
 Then, with the aggregate data, plot both values on a graph (or pair of graphs).
 
 This will allow us to visualize and correlate the differences between the two measures.
+
+## 13/9/2013 ##
+
+
+1. Make the output script only show the gene name and not the whole filepath. I think this can be done with just regular expressions and such
+2. Make header line print to the output file properly

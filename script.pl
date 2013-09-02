@@ -36,8 +36,11 @@ my $trxData   = "trxData.r";
 print "\nInitializing...\n\n";
 
 # This creates a separate CSV file for each species
+# and prints a header line with the species name
 foreach (keys %Saccharomyces) {
 	open(FILE, ">", "$_.csv");
+	print "Saccharomyces $_\n";
+	print "gene,line number,code\n";
 	close FILE;
 }
 
@@ -73,9 +76,12 @@ foreach my $fileName (@yeastGenome) {
 				if ( $fileName =~ $isItCrick ) {
 					$line = reverseCompliment($line);
 				}
-				
+			
+				# Report the data to the respective CSV file in the
+				# following format:
+				# 		gene,code	
 				open(FILE, ">>$species.csv");
-				print FILE $line;
+				print FILE $fileName . "," . $line . "\n";
 				close FILE;
 
 				# Not done yet... We have to run the TRX matches now
@@ -96,6 +102,24 @@ foreach my $fileName (@yeastGenome) {
 
 print "\nData has been written to CSV files.\n"; 
 
+foreach (keys %Saccharomyces) {
+	
+	# First, open the respective file
+	# Second, note the position on the genome -> $position
+	# 		Probably use a while loop and an increasing $i var
+	# 		Just make sure to record this into the resultant file with the TRX value
+	# Third, calculate the TRX value and write to a new file
+	# Fourth, move on to the next position
+	# Finally, close the file
+	open(FILE,"<$_.csv");
+
+	my @text = <FILE>;
+
+	foreach my $line (@text) {
+		
+	}	
+
+};
 
 # ##################################################################################################
 # Now we have a file, $trxData, that, when run as an R script via source() function, will (sort of) 
@@ -155,6 +179,7 @@ sub trxScore {
 		'ApT' =>  0
 	);
 
+	
 
 
 }

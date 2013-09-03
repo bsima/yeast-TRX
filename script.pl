@@ -37,12 +37,10 @@ print "\nInitializing...\n\n";
 # and prints a header line with the species name
 foreach (keys %Saccharomyces) {
 	open(FILE, ">", "$_.csv");
-	print FILE "Saccharomyces $_\n";
 	print FILE "gene,code\n";
 	close FILE;
 
     open(TRXSCORE,">$_-TRXscore.csv");
-    print TRXSCORE "Saccharomyces $_\n";
     print TRXSCORE "gene,dinucleotide,position,trx score\n";
     close TRXSCORE;
 }
@@ -203,7 +201,7 @@ sub trxScore {
             return $trxScores{$re};
         } 
     }
-    return "null";
+    return 0;
 }
 
 # @name printToSpecies

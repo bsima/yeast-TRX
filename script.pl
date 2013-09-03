@@ -28,7 +28,8 @@ my %trxSequences = (
 	'ApTApT' => qr/(AT.{1,}AT)/
 );
 my $trxData    = "trxData.r";
-my $geneRe     = qr/([\d|\w]+)[.|,][\d|\w]+/;
+my $geneNameRe = qr/([\d|\w]+)[.|,][\d|\w]+/;
+my $geneRe     = qr/,([atgcATGC-]+)/;
 my $lineNumber = 0;
 
 print "\nInitializing...\n\n";
@@ -57,7 +58,7 @@ foreach my $fileName (@yeastGenome) {
 
 	# Then, load the text of the file into an array	
 	my @text = <GENEFILE>;
-    my $geneName = match($geneRe,$fileName);
+    my $geneName = match($geneNameRe,$fileName);
 
     # Print to each of the species' CSV files the gene name we are currently analyzing
     printToSpecies("$geneName,");
@@ -97,7 +98,7 @@ foreach my $fileName (@yeastGenome) {
 	close GENEFILE;
 };
 
-print "\nData has been written to CSV files.\nNow calculating TRX Score.";
+print "\nData has been written to CSV files.\nNow calculating TRX Score.\n";
 
 # Now I have to loop through each species CSV file and read them straight away
 # I will have to track my position, but not line number.
@@ -110,18 +111,25 @@ foreach my $species (keys %Saccharomyces) {
    
     foreach my $line (@text) {
         
-        if ( $line =~ qr/.+,[acgtACGT]+/ ) {
+        if ( $line =~ qr/.+,([acgtACGT]+)/ ) {
        
-            my $geneName = match($geneRe,$line);
-       
+            my $geneName = match($geneNameRe,$line);
+            my $gene = match($geneRe,$line);
+
             # Print the data to the respective CSV file in the
             # following format:
             #       gene,dinucleotide,position,trx score
             open(TRXSCORE, ">>$species-TRXscore.csv") || die "Cannot open file: $!";
         
-            for ( my $position = 0; $position < length($line); $position++ ) {
-            
-                my $dinucleotide = substr($line,$position,2); 
+           
+            # Fixes the $position to count only the genetic code
+            # my $fixRe = qr/(^e.+,)/;
+            # my $crapLength = length(match($fixRe,$line));
+            # print "Crap length = " . $crapLength . "\n";
+
+            for ( my $position = 0; $position < length($gene); $position++ ) {
+
+                my $dinucleotide = substr($gene,$position,2); 
             
                 if ( $dinucleotide =~ qr/[actgACTG]{2}/ ) {     
                     my $trxValue = trxScore($dinucleotide);

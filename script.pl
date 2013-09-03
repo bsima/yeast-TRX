@@ -27,8 +27,8 @@ my %trxSequences = (
 	'ApCGpT' => qr/(AC.{1,}GT)/,
 	'ApTApT' => qr/(AT.{1,}AT)/
 );
-my $trxData   = "trxData.r";
-my $geneRe  = qr/\/([\d|\w]+)\.[\d|\w]+/;
+my $trxData    = "trxData.r";
+my $geneRe     = qr/([\d|\w]+)[.|,][\d|\w]+/;
 my $lineNumber = 0;
 
 print "\nInitializing...\n\n";
@@ -43,7 +43,7 @@ foreach (keys %Saccharomyces) {
 
     open(TRXSCORE,">$_-TRXscore.csv");
     print TRXSCORE "Saccharomyces $_\n";
-    print TRXSCORE "gene,dinucleotide,line number,position,trx score\n";
+    print TRXSCORE "gene,dinucleotide,position,trx score\n";
     close TRXSCORE;
 }
 
@@ -55,17 +55,18 @@ print "----------------------\n\n";
 foreach my $fileName (@yeastGenome) {
 
 	# First, open each file.	
-	open(FILE, $fileName) || die "Cannot open file: $!";
+	open(GENEFILE, $fileName) || die "Cannot open file: $!";
 
 	# Then, load the text of the file into an array	
-	my @text = <FILE>;
+	my @text = <GENEFILE>;
+    my $geneName = match($geneRe,$fileName);
 
-	# For each line of the file, extract the genetic code (using my awesome match sub)
+    # Print to each of the species' CSV files the gene name we are currently analyzing
+    printToSpecies("$geneName,");
+
+	# For each line of the gene file, extract the genetic code (using my awesome match sub)
 	foreach my $line (@text) {
-        
-        # Track the line I'm reading
-        $lineNumber++;
-		
+
         # Lets cycle through each species
 		foreach my $species (keys %Saccharomyces) {
 
@@ -82,44 +83,58 @@ foreach my $fileName (@yeastGenome) {
 				if ( $fileName =~ $isItCrick ) {
 					$line = reverseCompliment($line);
 				}
-				
-				# Get the specific gene name from the $fileName
-				my $geneName = match($geneRe,$fileName);
-
-				# Report the data to the respective CSV file in the
-				# following format:
-				# 		gene,code	
-				open(FILE, ">>$species.csv") || die "Cannot open file: $!";
-				print FILE $geneName . "," . $line . "\n";
-				close FILE;
-
-                # While I still have the $line of code to work with,
-                # I might as well loop through the letters and 
-                # calculate the TRX values
-                #
-                # Print the data to the respective CSV file in the
-                # following format:
-                #       gene,dinucleotide,line number,position,trx score
-                open(TRXSCORE, ">>$species-TRXscore.csv") || die "Cannot open file: $!";
-                for ( my $position = 0; $position < length($line); $position++ ) {
-                    my $dinucleotide = substr($line,$position,2); 
-                    if ( length($dinucleotide) == 2 ) {     
-                        my $trxValue = trxScore($dinucleotide);
-                        print TRXSCORE $geneName . "," . $dinucleotide . "," . $lineNumber . "," . $position . "," . $trxValue . "\n";
-                    }
-                }
-                close TRXSCORE;
-
+        
+				# Append the data to the species CSV file 
+                open(SPECIES, ">>$species.csv") || die "Cannot open file: $!\n";
+                print SPECIES $line; 
+                close SPECIES;
 		    } 
 		}
 	}
-    
-    # Reset $lineNumber counter
-    $lineNumber = 0;
-	close FILE;
+  
+    # End the line of genetic code for this gene with a
+    # line break character
+    printToSpecies("\n");
+
+	close GENEFILE;
 };
 
-print "\nData has been written to CSV files,\nand TRX Score has been calculated.";
+print "\nData has been written to CSV files.\nNow calculating TRX Score.";
+
+# Now I have to loop through each species CSV file and read them straight away
+# I will have to track my position, but not line number.
+#
+
+foreach my $species (keys %Saccharomyces) {
+
+    open(SPECIES,"<$species.csv") || die "Cannot open file: $!";
+    my @text = <SPECIES>;
+   
+    foreach my $line (@text) {
+        
+        if ( $line =~ qr/.+,[acgtACGT]+/ ) {
+       
+            my $geneName = match($geneRe,$line);
+       
+            # Print the data to the respective CSV file in the
+            # following format:
+            #       gene,dinucleotide,position,trx score
+            open(TRXSCORE, ">>$species-TRXscore.csv") || die "Cannot open file: $!";
+        
+            for ( my $position = 0; $position < length($line); $position++ ) {
+            
+                my $dinucleotide = substr($line,$position,2); 
+            
+                if ( $dinucleotide =~ qr/[actgACTG]{2}/ ) {     
+                    my $trxValue = trxScore($dinucleotide);
+                    print TRXSCORE $geneName . "," . $dinucleotide . "," . $position . "," . $trxValue . "\n";
+                }
+            }
+            close TRXSCORE;
+        }
+    }
+    close SPECIES;
+}
 
 
 # @name match
@@ -188,9 +203,24 @@ sub trxScore {
             return $trxScores{$re};
         } 
     }
-     return "null";
+    return "null";
 }
 
+# @name printToSpecies
+# @description Loops through the $species.csv files and writes something to them
+# @param $str {string} Text to be written
+sub printToSpecies {
+
+    my ( $str ) = @_;
+
+	foreach my $species (keys %Saccharomyces) {
+        # Get the specific gene name from the $fileName
+        open(SPECIES, ">>$species.csv") || die "Cannot open file: $!\n";
+        print SPECIES $str; 
+        close SPECIES;
+    }
+    return 1;
+}
 # @name position
 # @description A loop that updates and returns the current position on the genome
 sub position {

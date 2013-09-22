@@ -27,10 +27,11 @@ my %trxSequences = (
 	'ApCGpT' => qr/(AC.{1,}GT)/,
 	'ApTApT' => qr/(AT.{1,}AT)/
 );
-my $trxData    = "trxData.r";
-my $geneNameRe = qr/([\d|\w]+)[.|,][\d|\w]+/;
-my $geneRe     = qr/,([atgcATGC-]+)/;
-my $lineNumber = 0;
+my $trxData     = "trxData.r";
+my $geneNameRe  = qr/([\d|\w]+)[.|,][\d|\w]+/;
+my $geneRe      = qr/,([atgcATGC-]+)/;
+my $lineNumber  = 0;
+my $fileTracker = 0;
 
 print "\nInitializing...\n\n";
 
@@ -96,6 +97,9 @@ foreach my $fileName (@yeastGenome) {
     printToSpecies("\n");
 
 	close GENEFILE;
+
+    $fileTracker++;
+    print "File number: $fileTracker\n";
 };
 
 print "\nData has been written to CSV files.\nNow calculating TRX Score.\n";
@@ -109,6 +113,8 @@ foreach my $species (keys %Saccharomyces) {
     open(SPECIES,"<$species.csv") || die "Cannot open file: $!";
     my @text = <SPECIES>;
    
+    print "Working on $species right now.\n";
+
     foreach my $line (@text) {
         
         if ( $line =~ qr/.+,([acgtACGT]+)/ ) {
@@ -142,7 +148,12 @@ foreach my $species (keys %Saccharomyces) {
     close SPECIES;
 }
 
-
+# Initiate R scripts
+#
+print "Initating R scripts";
+open(R, "| R --vanilla") || die "Could not start R command line\n";
+print R 'source("plot.R")';
+close R;
 # @name match
 # @description Matches a given text to a regular expression. First pass the regular expression, then the text as params. Returns the matched text.
 # @param $re {string} Regular expression

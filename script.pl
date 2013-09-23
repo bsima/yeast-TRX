@@ -7,7 +7,7 @@ use diagnostics;
 #use File::Copy;
 
 # Var matey!
-my @yeastGenome = glob "./YeastGenome-tmp/*";
+my @yeastGenome = glob "./data/YeastGenome-tmp/*";
 my $isItCrick   = qr/.{1,}C.aln/;
 my %Saccharomyces = (
 	'cerevisiae' => qr/Scer\s{12}([atgcATGC-]{1,})/,
@@ -27,7 +27,6 @@ my %trxSequences = (
 	'ApCGpT' => qr/(AC.{1,}GT)/,
 	'ApTApT' => qr/(AT.{1,}AT)/
 );
-my $trxData     = "trxData.r";
 my $geneNameRe  = qr/([\d|\w]+)[.|,][\d|\w]+/;
 my $geneRe      = qr/,([atgcATGC-]+)/;
 my $lineNumber  = 0;
@@ -38,11 +37,11 @@ print "\nInitializing...\n\n";
 # This creates a separate CSV file for each species
 # and prints a header line with the species name
 foreach (keys %Saccharomyces) {
-	open(FILE, ">", "$_.csv");
+	open(FILE, ">", "./data/$_.csv");
 	print FILE "gene,code\n";
 	close FILE;
 
-    open(TRXSCORE,">$_-TRXscore.csv");
+    open(TRXSCORE,">./data/$_-TRXscore.csv");
     print TRXSCORE "gene,dinucleotide,position,trx score\n";
     close TRXSCORE;
 }
@@ -85,7 +84,7 @@ foreach my $fileName (@yeastGenome) {
 				}
         
 				# Append the data to the species CSV file 
-                open(SPECIES, ">>$species.csv") || die "Cannot open file: $!\n";
+                open(SPECIES, ">>./data/$species.csv") || die "Cannot open file: $!\n";
                 print SPECIES $line; 
                 close SPECIES;
 		    } 
@@ -110,7 +109,7 @@ print "\nData has been written to CSV files.\nNow calculating TRX Score.\n";
 
 foreach my $species (keys %Saccharomyces) {
 
-    open(SPECIES,"<$species.csv") || die "Cannot open file: $!";
+    open(SPECIES,"<./data/$species.csv") || die "Cannot open file: $!";
     my @text = <SPECIES>;
    
     print "Working on $species right now.\n";
@@ -125,7 +124,7 @@ foreach my $species (keys %Saccharomyces) {
             # Print the data to the respective CSV file in the
             # following format:
             #       gene,dinucleotide,position,trx score
-            open(TRXSCORE, ">>$species-TRXscore.csv") || die "Cannot open file: $!";
+            open(TRXSCORE, ">>./data/$species-TRXscore.csv") || die "Cannot open file: $!";
         
            
             # Fixes the $position to count only the genetic code
@@ -237,9 +236,4 @@ sub printToSpecies {
         close SPECIES;
     }
     return 1;
-}
-# @name position
-# @description A loop that updates and returns the current position on the genome
-sub position {
-    
 }

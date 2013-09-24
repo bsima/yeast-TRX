@@ -1,5 +1,6 @@
 #!/bin/bash
-rm bayanus*
-rm cerevisiae*
-rm martinae*
-rm paradoxus*
+rm data/bayanus**
+rm data/cerevisiae*
+rm data/martinae*
+rm data/paradoxus*
+rm -rf plots/*

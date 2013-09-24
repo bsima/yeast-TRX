@@ -231,7 +231,7 @@ sub printToSpecies {
 
 	foreach my $species (keys %Saccharomyces) {
         # Get the specific gene name from the $fileName
-        open(SPECIES, ">>$species.csv") || die "Cannot open file: $!\n";
+        open(SPECIES, ">>./data/$species.csv") || die "Cannot open file: $!\n";
         print SPECIES $str; 
         close SPECIES;
     }

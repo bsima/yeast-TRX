@@ -153,6 +153,9 @@ print "Initating R scripts";
 open(R, "| R --vanilla") || die "Could not start R command line\n";
 print R 'source("plot.R")';
 close R;
+
+print "\n\nAll Done!\nNow enjoy a cup of tea.\n\n";
+
 # @name match
 # @description Matches a given text to a regular expression. First pass the regular expression, then the text as params. Returns the matched text.
 # @param $re {string} Regular expression

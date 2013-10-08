@@ -1,6 +1,12 @@
 #!/bin/bash
-rm data/bayanus**
-rm data/cerevisiae*
-rm data/martinae*
-rm data/paradoxus*
-rm plots/*
+#
+# Just get rid of crap
+
+rm -rf data/bayanus*;
+rm -rf data/cerevisiae*;
+rm -rf data/martinae*;
+rm -rf data/paradoxus*;
+rm plots/*;
+rm Rplots.pdf;
+
+echo "All clean!";

@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 use diagnostics;
+use Statistics::Descriptive;
 
-#use File::Copy;
 
 # Var matey!
 my @yeastGenome = glob "./data/YeastGenome-tmp/*";
@@ -27,23 +27,39 @@ my %trxSequences = (
 	'ApCGpT' => qr/(AC.{1,}GT)/,
 	'ApTApT' => qr/(AT.{1,}AT)/
 );
+my %deltaESequences = (
+    'rA/rA' => qr/(AA)/,
+	'rA/rC' => qr/(AC)/,
+	'rA/rG' => qr/(AG)/,
+	'rA/rU' => qr/(AU)/,
+	'rC/rA' => qr/(CA)/,
+    'rC/rC' => qr/(CC)/,
+	'rC/rG' => qr/(CG)/,
+	'rC/rU' => qr/(CU)/,
+	'rG/rA' => qr/(GA)/,
+	'rG/rC' => qr/(GC)/,
+    'rG/rG' => qr/(GG)/,
+    'rG/rU' => qr/(GU)/,
+    'rU/rA' => qr/(UA)/,
+    'rU/rC' => qr/(UC)/,
+    'rU/rG' => qr/(UG)/,
+    'rU/rU' => qr/(UU)/
+);
 my $geneNameRe  = qr/([\d|\w]+)[.|,][\d|\w]+/;
 my $geneRe      = qr/,([atgcATGC-]+)/;
-my $lineNumber  = 0;
 my $fileTracker = 0;
 
 print "\nInitializing...\n\n";
 
-# This creates a separate CSV file for each species
-# and prints a header line with the species name
-foreach (keys %Saccharomyces) {
-	open(FILE, ">", "./data/$_.csv");
+# Setup the directories for each species and
+# the data files
+foreach my $species (keys %Saccharomyces) {
+	
+    mkdir("./data/$species");
+    
+    open(FILE, ">", "./data/$species/genome.csv");
 	print FILE "gene,code\n";
-	close FILE;
-
-    open(TRXSCORE,">./data/$_-TRXscore.csv");
-    print TRXSCORE "gene,dinucleotide,position,trx score\n";
-    close TRXSCORE;
+	close FILE; 
 }
 
 print "Currently writing data\n";
@@ -62,6 +78,17 @@ foreach my $fileName (@yeastGenome) {
 
     # Print to each of the species' CSV files the gene name we are currently analyzing
     printToSpecies("$geneName,");
+
+    # Setup the data files for writing the TRX and delta-E values later.
+    # We have to do this now while we have the `$geneName` varialbe available.
+    foreach my $species (keys %Saccharomyces) {
+        open(RAW,">./data/$species/$geneName/raw.csv");
+            print RAW "gene,dinucleotide,position,trx.score,energy.score\n";
+        undef RAW; 
+        open(SMOOTH,">./data/$species/$geneName/smooth.csv");
+            print SMOOTH "gene,position,trx.score,energy.score\n";
+        undef SMOOTH;
+    }
 
 	# For each line of the gene file, extract the genetic code (using my awesome match sub)
 	foreach my $line (@text) {
@@ -84,7 +111,7 @@ foreach my $fileName (@yeastGenome) {
 				}
         
 				# Append the data to the species CSV file 
-                open(SPECIES, ">>./data/$species.csv") || die "Cannot open file: $!\n";
+                open(SPECIES, ">>./data/$species/genome.csv") || die "Cannot open file: $!\n";
                 print SPECIES $line; 
                 close SPECIES;
 		    } 
@@ -101,51 +128,90 @@ foreach my $fileName (@yeastGenome) {
     print "File number: $fileTracker\n";
 };
 
-print "\nData has been written to CSV files.\nNow calculating TRX Score.\n";
+print "\nGenomes have been written to CSV files.\nNow calculating TRX and delta-E Scores.\n";
 
-# Now I have to loop through each species CSV file and read them straight away
-# I will have to track my position, but not line number.
-#
 
+# Let's loop through each `$species/genome.csv` and read them straigt away.
 foreach my $species (keys %Saccharomyces) {
 
-    open(SPECIES,"<./data/$species.csv") || die "Cannot open file: $!";
-    my @text = <SPECIES>;
-   
+    open(SPECIES,"<./data/$species/genome.csv") || die "Cannot open file: $!";
+    my @text = <SPECIES>;    
+
     print "Working on $species right now.\n";
 
+    # Each line of the `$species/genome.csv` contains the entire code of one gene.
+    # We will loop through each line (gene) and calculate two things: the raw TRX
+    # and delta-E scores, and the smoothed TRX and delta-E.
     foreach my $line (@text) {
         
+        # Only run the calculation is we have genetic code.
+        # Also, we strip out the prepended gene name in the file.
         if ( $line =~ qr/.+,([acgtACGT]+)/ ) {
        
             my $geneName = match($geneNameRe,$line);
             my $gene = match($geneRe,$line);
 
-            # Print the data to the respective CSV file in the
-            # following format:
-            #       gene,dinucleotide,position,trx score
-            open(TRXSCORE, ">>./data/$species-TRXscore.csv") || die "Cannot open file: $!";
-        
-           
-            # Fixes the $position to count only the genetic code
-            # my $fixRe = qr/(^e.+,)/;
-            # my $crapLength = length(match($fixRe,$line));
-            # print "Crap length = " . $crapLength . "\n";
-
+            # Raw data
+            # 
+            # This is the original formulation that calculates the trxValue and
+            # energyScore on a per-dinucleotide basis. It then prints the data 
+            # to the respective CSV file in the following format:
+            #       gene,dinucleotide,position,trx.score,energy.score
+            open(RAW, ">>./data/$species/$geneName/raw.csv") || die "Cannot open file: $!";
             for ( my $position = 0; $position < length($gene); $position++ ) {
+                my $dinucleotide = substr($gene,$position,2); 
+            
+                if ( $dinucleotide =~ qr/[actgACTG]{2}/ ) {     
+                    my $trxValue = trxScore($dinucleotide);
+                    my $energyScore = energyScore($dinucleotide);
+                   
+                    print RAW $geneName . "," . $dinucleotide . "," . $position . "," . $trxValue . "," . $energyScore . "\n";
+                }
+            }
+            undef RAW;
+           
+            # Smoothing function
+            #
+            # This moves through the gene data and counts the position until it arrives
+            # at the end of the smoothing window (e.g. 200). Then it calculates the average
+            # of the selected data set and outputs it into the respecive `smooth.csv` file 
+            # in the following format, to be read later by R's graphing functions:
+            #       gene,position,trx.score,energy.score
+            open(SMOOTH, ">>./data/$species/$geneName/smooth.csv") || die "Cannot open file $!";
+            my $start = 0;
+            my $smoothing = 200; 
+            for ( my $position = $start; $position < ($position+$smoothing); $position = $position+$smoothing ) {
+
+                my @trxValues;
+                my @energyScores;
 
                 my $dinucleotide = substr($gene,$position,2); 
             
                 if ( $dinucleotide =~ qr/[actgACTG]{2}/ ) {     
                     my $trxValue = trxScore($dinucleotide);
-                    print TRXSCORE $geneName . "," . $dinucleotide . "," . $position . "," . $trxValue . "\n";
+                    my $energyScore = energyScore($dinucleotide);
+                    
+                    push $trxValue,@trxValues;
+                    push $energyScore,@energyScores;
                 }
+                
+                my $trxStat = Statistics::Descriptive::Full->new();
+                $trxStat->add_data(@trxValues);
+                my $trxMean = $trxStat->mean();
+
+                my $energyStat = Statistics::Descriptive::Full->new();
+                $energyStat->addData(@energyScores);
+                my $energyMean = $energyStat->mean();
+                
+                print SMOOTH $geneName . "," . $position . "," . $trxMean . "," . $energyMean . "\n";
+
+                $start = $position;
             }
-            close TRXSCORE;
+            undef SMOOTH;
         }
-    }
-    close SPECIES;
+    } 
 }
+
 
 # Initiate R scripts
 #
@@ -197,7 +263,6 @@ sub trxScore {
    
     my ( $dinucleotide ) = @_;
 
-    # @TODO Find the paper where I got these scores from... Can't remember 
 	my %trxScores = (
 		qr/(CG)/ => 43,
 		qr/(CA)/ => 42,
@@ -225,8 +290,43 @@ sub trxScore {
     return 0;
 }
 
+# @name energyScore
+# @description Calculates and returns the delta-E value of a given phosphate linkage
+# @param $dinucleotide {string} The nucleotide to be checked
+# @return {integer} The delta-E value
+sub energyScore {
+   
+    my ( $dinucleotide ) = @_;
+
+	my %energyScores = (
+		qr/(AA)/ => -18.5,
+		qr/(AC)/ => -19.0,
+		qr/(AG)/ => -23.6,
+		qr/(AU)/ => -15.7,
+        qr/(CA)/ => -20.0,
+		qr/(CC)/ => -21.4,
+		qr/(CG)/ => -26.9,
+		qr/(CU)/ => -17.2,
+        qr/(GA)/ => -23.7,
+        qr/(GC)/ => -22.9,
+        qr/(GG)/ => -24.3,
+		qr/(GU)/ => -18.9,
+		qr/(UA)/ => -19.6,
+		qr/(UC)/ => -28.2,
+		qr/(UG)/ => -23.3,
+		qr/(UU)/ => -15.8
+	);
+
+    foreach my $re (keys %energyScores) {
+        if ( match($re,$dinucleotide) ) {
+            return $energyScores{$re};
+        } 
+    }
+    return 0;
+}
+
 # @name printToSpecies
-# @description Loops through the $species.csv files and writes something to them
+# @description Loops through the $species/genome.csv files and writes something to them
 # @param $str {string} Text to be written
 sub printToSpecies {
 
@@ -234,7 +334,7 @@ sub printToSpecies {
 
 	foreach my $species (keys %Saccharomyces) {
         # Get the specific gene name from the $fileName
-        open(SPECIES, ">>./data/$species.csv") || die "Cannot open file: $!\n";
+        open(SPECIES, ">>./data/$species/genome.csv") || die "Cannot open file: $!\n";
         print SPECIES $str; 
         close SPECIES;
     }

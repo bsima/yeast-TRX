@@ -2,14 +2,11 @@ library(ggplot2)
 
 plotMe = function(species) {
 
-    path = paste('./data/', species, '-TRXscore.csv', sep = '')
-    class(path)
+    path = paste('./data/', species, '/calc.csv', sep = '') 
     
     df = read.table(path, sep = ',', header = TRUE)
-    class(df)
 
-    plot = qplot(data = df, x = position, y = trx.score, facets =~ gene, color = gene)
-    class(plot)
+    plot = qplot(data = df, x = 1:length(df$position), y = trx.score, facets =~ gene, color = gene) + geom_line()
 
     plot
 

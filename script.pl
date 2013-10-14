@@ -45,7 +45,7 @@ my %deltaESequences = (
     'rU/rG' => qr/(UG)/,
     'rU/rU' => qr/(UU)/
 );
-my $geneNameRe  = qr/([\d|\w]{5,})[.|,][\d|\w]+/;
+my $geneNameRe  = qr/([\d\w]{5,})[.,][\d|\w]+/;
 my $geneRe      = qr/,([atgcATGC-]+)/;
 my $fileTracker = 0;
 

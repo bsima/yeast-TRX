@@ -87,10 +87,10 @@ foreach my $fileName (@yeastGenome) {
         mkdir("./data/$species/$geneName");
         
         open(my $raw,">./data/$species/$geneName/raw.csv");
-            print $raw "gene,dinucleotide,position,trx.score,energy.score\n";
+            print $raw "gene,dinucleotide,position,trxScore,energyScore\n";
         close $raw; 
         open(my $smooth,">./data/$species/$geneName/smooth.csv");
-            print $smooth "gene,position,trx.score,energy.score\n";
+            print $smooth "gene,position,trxMean,energyMean\n";
         close $smooth;
     }
 
@@ -153,7 +153,7 @@ foreach my $species (keys %Saccharomyces) {
 
         chomp($line);
         # Only run the calculation is we have genetic code.
-        if ( defined $line && $line =~ qr/.+,[acgtACGT-]+/ ) {
+        if ( defined $line && $line =~ m/e.{4,},[acgtACGT-]+/ ) {
        
             # Break up the CSV file, get useful info
             my $geneName = match($geneNameRe,$line);
@@ -169,7 +169,7 @@ foreach my $species (keys %Saccharomyces) {
             for ( my $position = 0; $position < length($gene); $position++ ) {
                 my $dinucleotide = substr($gene,$position,2); 
             
-                if ( $dinucleotide =~ qr/[actgACTG]{2}/ ) {     
+                if ( $dinucleotide =~ m/[actgACTG-]{2}/ ) {     
                     my $trxValue = trxScore($dinucleotide);
                     my $energyScore = energyScore($dinucleotide);
                    
@@ -196,22 +196,16 @@ foreach my $species (keys %Saccharomyces) {
                 
                 # Loop through every character
                 for ( my $position = 0; $position <= $smoothingWindow; $position++ ) {
-if ($position <= $smoothingWindow) { print "$position Position is less than smoothing window\n"; } else { print "Position is more than smoothing window\n"; };
                     my $dinucleotide = substr($gene,$position,2); 
 
-                    if ( $dinucleotide =~ qr/[actgACTG]{2}/ ) {     
+                    if ( $dinucleotide =~ m/[actgACTG]{2}/ ) {     
                         my $trxValue = trxScore($dinucleotide);
                         my $energyScore = energyScore($dinucleotide);
                        
                         #print "trxValue = $trxValue\n"; 
                         push @trxValues, $trxValue;
                         push @energyScores, $energyScore;
-                    } else {
-                        next;
-                    }
-                   
-                    #print "trxValues = @trxValues \n";
-                    #print "trxValues[smoothing] = $trxValues[$smoothing]\n";
+                    }                    
                 }
 
                 # Now run the calculations and print to SMOOTH
@@ -221,8 +215,21 @@ if ($position <= $smoothingWindow) { print "$position Position is less than smoo
                 my $energyStat = Statistics::Descriptive::Full->new();
                 $energyStat->add_data(@energyScores);
                 my $energyMean = $energyStat->mean();
-                
+              
+                print "$geneName $smoothing: TRX Values @trxValues\n"; 
+                print "$geneName $smoothing: TRX Mean is $trxMean.\n";
+
+                # Let's try doing the calculations myself
+                # my $trxSum;
+                # map { $trxSum += $_ } @trxValues;
+                # my $trxMean = substr($trxSum/$smoothingWindow,0,10);
+
+                # my $energySum;
+                # map { $energySum += $_ } @energyScores;
+                # my $energyMean = substr($energySum/$smoothingWindow,0,10);
+
                 print $smooth $geneName . "," . $smoothing . "," . $trxMean . "," . $energyMean . "\n";
+                 
             }
             close $smooth;
         }
@@ -296,7 +303,9 @@ sub trxScore {
 		qr/(TT)/ =>  5,
 		qr/(AC)/ =>  4,
 		qr/(GT)/ =>  4,
-		qr/(AT)/ =>  0
+		qr/(AT)/ =>  0,
+        qr/(.-)/ =>  0,
+        qr/(-.)/ =>  0   # These last two are necessary for dealing with missing values in the genomes
 	);
 
     foreach my $re (keys %trxScores) {
@@ -331,7 +340,9 @@ sub energyScore {
 		qr/(UA)/ => -19.6,
 		qr/(UC)/ => -28.2,
 		qr/(UG)/ => -23.3,
-		qr/(UU)/ => -15.8
+		qr/(UU)/ => -15.8,
+        qr/(.-)/ =>     0,
+        qr/(-.)/ =>     0   # These last two are necessary for dealing with missing values in the genomes
 	);
 
     foreach my $re (keys %energyScores) {

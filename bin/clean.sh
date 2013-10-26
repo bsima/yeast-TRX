@@ -14,7 +14,7 @@ echo "Removed data/martinae*";
 rm -rf data/paradoxus*;
 echo "Removed data/paradoxus*";
 
-rm plots/*;
+rm -rf plots/*;
 echo "Removed plots/*";
 
 rm Rplots.pdf;

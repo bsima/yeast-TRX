@@ -45,7 +45,8 @@ my %deltaESequences = (
     'rU/rG' => qr/(UG)/,
     'rU/rU' => qr/(UU)/
 );
-my $geneNameRe  = qr/([\d\w]{5,})[.,][\d|\w]+/;
+#my $geneNameRe  = qr/([\d\w]{5,})[.,][\d\w]+/;
+my $geneNameRe  = qr/(eY\w{5}[CW])/;
 my $geneRe      = qr/,([atgcATGC-]+)/;
 my $fileTracker = 0;
 
@@ -77,7 +78,7 @@ foreach my $fileName (@yeastGenome) {
     my $geneName = match($geneNameRe,$fileName);
 
     # Print to each of the species' CSV files the gene name we are currently analyzing
-    printToSpecies("$geneName,");
+    printToGenome("$geneName,");
 
     # Setup the data files for writing the TRX and delta-E values later.
     # We have to do this now while we have the `$geneName` varialbe available.
@@ -123,7 +124,7 @@ foreach my $fileName (@yeastGenome) {
   
     # End the line of genetic code for this gene with a
     # line break character
-    printToSpecies("\n");
+    printToGenome("\n");
 
 	close GENEFILE;
 
@@ -149,11 +150,12 @@ foreach my $species (keys %Saccharomyces) {
     # We will loop through each line (gene) and calculate two things: the raw TRX
     # and delta-E scores, and the smoothed TRX and delta-E.
     foreach my $line (@text) {
-    
+
+        chomp($line);
         # Only run the calculation is we have genetic code.
-        # Also, we strip out the prepended gene name in the file.
         if ( defined $line && $line =~ qr/.+,[acgtACGT-]+/ ) {
        
+            # Break up the CSV file, get useful info
             my $geneName = match($geneNameRe,$line);
             my $gene = match($geneRe,$line);
 
@@ -163,7 +165,7 @@ foreach my $species (keys %Saccharomyces) {
             # energyScore on a per-dinucleotide basis. It then prints the data 
             # to the respective CSV file in the following format:
             #       gene,dinucleotide,position,trx.score,energy.score 
-            open(RAW, ">>./data/$species/$geneName/raw.csv") || die "Cannot open file: $!";
+            open(my $raw, ">>./data/$species/$geneName/raw.csv") || die "Cannot open file: $!";
             for ( my $position = 0; $position < length($gene); $position++ ) {
                 my $dinucleotide = substr($gene,$position,2); 
             
@@ -171,10 +173,11 @@ foreach my $species (keys %Saccharomyces) {
                     my $trxValue = trxScore($dinucleotide);
                     my $energyScore = energyScore($dinucleotide);
                    
-                    print RAW $geneName . "," . $dinucleotide . "," . $position . "," . $trxValue . "," . $energyScore . "\n";
+                    print $raw $geneName . "," . $dinucleotide . "," . $position . "," . $trxValue . "," . $energyScore . "\n";
                 }
+            
             }
-            close RAW;
+            close $raw;
            
             # Smoothing function
             #
@@ -183,45 +186,47 @@ foreach my $species (keys %Saccharomyces) {
             # of the selected data set and outputs it into the respecive `smooth.csv` file 
             # in the following format, to be read later by R's graphing functions:
             #       gene,position,trx.mean,energy.mean
-            open(SMOOTH, ">>./data/$species/$geneName/smooth.csv") || die "Cannot open file $!";
-            my $start = 0;
-            my $smoothingWindow = 200; 
-            for ( my $position = $start; $position < length($gene); $position++ ) {
+            open(my $smooth, ">>./data/$species/$geneName/smooth.csv") || die "Cannot open file $!";
+            my $smoothingWindow = 200;
+            # Loop through every 200 characters
+            for ( my $smoothing = 0; $smoothing < length($gene); $smoothing=$smoothing+$smoothingWindow ) {
+               
+                my @trxValues;
+                my @energyScores;
                 
-                for ( my $smoothing = 0; $smoothing < $smoothingWindow; $smoothing++ ) {
-                
-                    my @trxValues;
-                    my @energyScores;
-
+                # Loop through every character
+                for ( my $position = 0; $position <= $smoothingWindow; $position++ ) {
+if ($position <= $smoothingWindow) { print "$position Position is less than smoothing window\n"; } else { print "Position is more than smoothing window\n"; };
                     my $dinucleotide = substr($gene,$position,2); 
-            
+
                     if ( $dinucleotide =~ qr/[actgACTG]{2}/ ) {     
                         my $trxValue = trxScore($dinucleotide);
                         my $energyScore = energyScore($dinucleotide);
                        
-                        # print $trxValue; 
-                        push @trxValues,$trxValue;
-                        push @energyScores,$energyScore;
+                        #print "trxValue = $trxValue\n"; 
+                        push @trxValues, $trxValue;
+                        push @energyScores, $energyScore;
+                    } else {
+                        next;
                     }
                    
                     #print "trxValues = @trxValues \n";
-
-                    my $trxStat = Statistics::Descriptive::Full->new();
-                    $trxStat->add_data($trxValues[$smoothing]);
-                    #print "trxStat = $trxStat \n";
-                    my $trxMean = $trxStat->mean();
-
-                    my $energyStat = Statistics::Descriptive::Full->new();
-                    $energyStat->add_data($energyScores[$smoothing]);
-                    my $energyMean = $energyStat->mean();
-                    
-                    print SMOOTH $geneName . "," . $position . "," . $trxMean . "," . $energyMean . "\n";
-
+                    #print "trxValues[smoothing] = $trxValues[$smoothing]\n";
                 }
+
+                # Now run the calculations and print to SMOOTH
+                my $trxStat = Statistics::Descriptive::Full->new();
+                $trxStat->add_data(@trxValues);
+                my $trxMean = $trxStat->mean();
+                my $energyStat = Statistics::Descriptive::Full->new();
+                $energyStat->add_data(@energyScores);
+                my $energyMean = $energyStat->mean();
+                
+                print $smooth $geneName . "," . $smoothing . "," . $trxMean . "," . $energyMean . "\n";
             }
-            close SMOOTH;
+            close $smooth;
         }
-    } 
+    }
 }
 
 
@@ -340,7 +345,7 @@ sub energyScore {
 # @name printToSpecies
 # @description Loops through the $species/genome.csv files and writes something to them
 # @param $str {string} Text to be written
-sub printToSpecies {
+sub printToGenome {
 
     my ( $str ) = @_;
 

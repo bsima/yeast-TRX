@@ -120,6 +120,11 @@ foreach my $fileName (@yeastGenome) {
                 close SPECIES;
 		    } 
 		}
+        
+        my $gattaca = qr/[Gg][Aa][Tt][Tt][Aa][Cc][Aa]/;
+        if ( match($gattaca,$line) ) {
+            print "\n\n\nWE HAVE GATTACA\n\n$line\n\n\n";
+        }
 	}
   
     # End the line of genetic code for this gene with a
@@ -157,7 +162,7 @@ foreach my $species (keys %Saccharomyces) {
        
             # Break up the CSV file, get useful info
             my $geneName = match($geneNameRe,$line);
-            my $gene = match($geneRe,$line);
+            my $gene     = match($geneRe,$line);
 
             # Raw data
             # 
@@ -167,10 +172,12 @@ foreach my $species (keys %Saccharomyces) {
             #       gene,dinucleotide,position,trx.score,energy.score 
             open(my $raw, ">>./data/$species/$geneName/raw.csv") || die "Cannot open file: $!";
             for ( my $position = 0; $position < length($gene); $position++ ) {
+                
                 my $dinucleotide = substr($gene,$position,2); 
             
                 if ( $dinucleotide =~ m/[actgACTG-]{2}/ ) {     
-                    my $trxValue = trxScore($dinucleotide);
+                    
+                    my $trxValue    = trxScore($dinucleotide);
                     my $energyScore = energyScore($dinucleotide);
                    
                     print $raw $geneName . "," . $dinucleotide . "," . $position . "," . $trxValue . "," . $energyScore . "\n";
@@ -188,14 +195,15 @@ foreach my $species (keys %Saccharomyces) {
             #       gene,position,trx.mean,energy.mean
             open(my $smooth, ">>./data/$species/$geneName/smooth.csv") || die "Cannot open file $!";
             my $smoothingWindow = 200;
+            my $smoothing = 0;
             # Loop through every 200 characters
-            for ( my $smoothing = 0; $smoothing < length($gene); $smoothing=$smoothing+$smoothingWindow ) {
+            for ( $smoothing; $smoothing < length($gene)-1; $smoothing=$smoothing+$smoothingWindow ) {
                
                 my @trxValues;
                 my @energyScores;
                 
                 # Loop through every character
-                for ( my $position = 0; $position <= $smoothingWindow; $position++ ) {
+                for ( my $position = 0; $position < $smoothing + $smoothingWindow && $position < length($gene)-1; $position++ ) {
                     my $dinucleotide = substr($gene,$position,2); 
 
                     if ( $dinucleotide =~ m/[actgACTG]{2}/ ) {     
@@ -216,8 +224,8 @@ foreach my $species (keys %Saccharomyces) {
                 $energyStat->add_data(@energyScores);
                 my $energyMean = $energyStat->mean();
               
-                print "$geneName $smoothing: TRX Values @trxValues\n"; 
-                print "$geneName $smoothing: TRX Mean is $trxMean.\n";
+                #print "$geneName $smoothing: TRX Values @trxValues\n"; 
+                #print "$geneName $smoothing: TRX Mean is $trxMean.\n";
 
                 # Let's try doing the calculations myself
                 # my $trxSum;
@@ -229,7 +237,8 @@ foreach my $species (keys %Saccharomyces) {
                 # my $energyMean = substr($energySum/$smoothingWindow,0,10);
 
                 print $smooth $geneName . "," . $smoothing . "," . $trxMean . "," . $energyMean . "\n";
-                 
+                #@trxValues = [0];
+                #@energyScores = [0];                
             }
             close $smooth;
         }
@@ -347,6 +356,7 @@ sub energyScore {
 
     foreach my $re (keys %energyScores) {
         if ( match($re,$dinucleotide) ) {
+            # return abs $energyScores{$re};
             return $energyScores{$re};
         } 
     }

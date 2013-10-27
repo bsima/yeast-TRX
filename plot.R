@@ -1,4 +1,9 @@
+library(plyr)
 library(ggplot2)
+
+geneNameDirs = './data/YeastGenome-tmp' 
+geneNames    = list.files(path = geneNameDirs, pattern = '(e.{1,})[[:punct:]]aln')
+geneNames    = sub('[[:punct:]]aln', '', geneNames) # This gets rid of the filename .aln ending
 
 plotMe = function(species) {
 
@@ -18,16 +23,13 @@ plotMe = function(species) {
         #genePosition = df$position
         #trxMean = df$trxMean
         #energyMean = df$energyMean
-        correlation = cor(x = df$trxMean, y = df$energyMean, method = 'pearson')
+        correlation = cor(x = df$trxMean, y = df$energyMean, use = "na.or.complete")
         plot = ggplot() +
                    geom_point(data = df, aes(x = position, y = trxMean), color = 'blue') +
-                   geom_point(data = df, aes(x = position, y = energyMean), color = 'red') +
+                   geom_point(data = df, aes(x = position, y = abs(energyMean)), color = 'red') +
                    geom_line(data = df, aes(x = position, y = trxMean)) +
-                   geom_line(data = df, aes(x = position, y = energyMean)) +
-                   guide_legend( title = legend ) +
-                   stat_function( fun = correlation )
-                   #geom_line(cor(df$trxMean, df$energyMean, method = "pearson"))
-
+                   geom_line(data = df, aes(x = position, y = abs(energyMean))) +
+                   annotate("text", label = paste('r=', correlation, sep=''),x=1000,y=5,size=5, color = 'red')
         plot
 
         plotPath = paste('./plots/', species, '/', gene, '.png', sep = '')
@@ -36,10 +38,10 @@ plotMe = function(species) {
 }
 
 speciesNames = c("bayanus","cerevisiae","martinae","paradoxus")
-geneNames    = c("eYAL001C","eYCL031C","eYDR181C","eYER111C","eYGR100W")
+#geneNames    = c("eYAL001C","eYCL031C","eYDR181C","eYER111C","eYGR100W")
 
-for (x in speciesNames) {
+for (x in speciesNames) {    
     plotMe(x)
 }
 
-q()
+#q()

@@ -23,7 +23,7 @@ plotMe = function(species) {
         #genePosition = df$position
         #trxMean = df$trxMean
         #energyMean = df$energyMean
-        correlation = cor(x = df$trxMean, y = df$energyMean, use = "na.or.complete")
+        correlation = cor(x = df$trxMean, y = abs(df$energyMean), use = "na.or.complete")
         plot = ggplot() +
                    geom_point(data = df, aes(x = position, y = trxMean), color = 'blue') +
                    geom_point(data = df, aes(x = position, y = abs(energyMean)), color = 'red') +

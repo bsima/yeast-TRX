@@ -7,7 +7,7 @@ use Statistics::Descriptive;
 
 
 # Var matey!
-my @yeastGenome = glob "./data/YeastGenome-tmp/*";
+my @yeastGenome = glob "../data/YeastGenome-tmp/*";
 my $isItCrick   = qr/.{1,}C.aln/;
 my %Saccharomyces = (
 	'cerevisiae' => qr/Scer\s{12}([atgcATGC-]{1,})/,
@@ -58,7 +58,7 @@ foreach my $species (keys %Saccharomyces) {
 	
     mkdir("./data/$species");
     
-    open(FILE, ">", "./data/$species/genome.csv");
+    open(FILE, ">", "../data/$species/genome.csv");
 	print FILE "gene,code\n";
 	close FILE; 
 }
@@ -84,9 +84,9 @@ foreach my $fileName (@yeastGenome) {
     # We have to do this now while we have the `$geneName` varialbe available.
     foreach my $species (keys %Saccharomyces) {
         
-        mkdir("./data/$species/$geneName");
+        mkdir("../data/$species/$geneName");
         
-        open(my $raw,">./data/$species/$geneName/raw.csv");
+        open(my $raw,">../data/$species/$geneName/raw.csv");
             print $raw "gene,dinucleotide,position,trxScore,energyScore\n";
         close $raw; 
         open(my $smooth,">./data/$species/$geneName/smooth.csv");
@@ -115,7 +115,7 @@ foreach my $fileName (@yeastGenome) {
 				}
         
 				# Append the data to the species CSV file 
-                open(SPECIES, ">>./data/$species/genome.csv") || die "Cannot open file: $!\n";
+                open(SPECIES, ">>../data/$species/genome.csv") || die "Cannot open file: $!\n";
                 print SPECIES $line; 
                 close SPECIES;
 		    } 
@@ -146,7 +146,7 @@ print "\nGenomes have been written to CSV files.\nNow calculating TRX and delta-
 # Let's loop through each `$species/genome.csv` and read them straigt away.
 foreach my $species (keys %Saccharomyces) {
 
-    open(SPECIES,"<./data/$species/genome.csv") || die "Cannot open file: $!";
+    open(SPECIES,"<../data/$species/genome.csv") || die "Cannot open file: $!";
     my @text = <SPECIES>;    
 
     print "Working on $species right now.\n";
@@ -170,7 +170,7 @@ foreach my $species (keys %Saccharomyces) {
             # energyScore on a per-dinucleotide basis. It then prints the data 
             # to the respective CSV file in the following format:
             #       gene,dinucleotide,position,trx.score,energy.score 
-            open(my $raw, ">>./data/$species/$geneName/raw.csv") || die "Cannot open file: $!";
+            open(my $raw, ">>../data/$species/$geneName/raw.csv") || die "Cannot open file: $!";
             for ( my $position = 0; $position < length($gene); $position++ ) {
                 
                 my $dinucleotide = substr($gene,$position,2); 
@@ -193,7 +193,7 @@ foreach my $species (keys %Saccharomyces) {
             # of the selected data set and outputs it into the respecive `smooth.csv` file 
             # in the following format, to be read later by R's graphing functions:
             #       gene,position,trx.mean,energy.mean
-            open(my $smooth, ">>./data/$species/$geneName/smooth.csv") || die "Cannot open file $!";
+            open(my $smooth, ">>../data/$species/$geneName/smooth.csv") || die "Cannot open file $!";
             my $smoothingWindow = 200;
             my $smoothing = 0;
             # Loop through every 200 characters
@@ -372,7 +372,7 @@ sub printToGenome {
 
 	foreach my $species (keys %Saccharomyces) {
         # Get the specific gene name from the $fileName
-        open(SPECIES, ">>./data/$species/genome.csv") || die "Cannot open file: $!\n";
+        open(SPECIES, ">>../data/$species/genome.csv") || die "Cannot open file: $!\n";
         print SPECIES $str; 
         close SPECIES;
     }

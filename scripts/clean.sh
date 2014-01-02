@@ -2,22 +2,24 @@
 #
 # Just get rid of crap
 
-rm -rf data/bayanus*;
+ROOT="`pwd`"
+
+rm -rf $ROOT/data/bayanus*;
 echo "Removed data/bayanus*";
 
-rm -rf data/cerevisiae*;
+rm -rf $ROOT/data/cerevisiae*;
 echo "Removed data/cerevisiae*";
 
-rm -rf data/martinae*;
+rm -rf $ROOT/data/martinae*;
 echo "Removed data/martinae*";
 
-rm -rf data/paradoxus*;
+rm -rf $ROOT/data/paradoxus*;
 echo "Removed data/paradoxus*";
 
-rm -rf plots/*;
-echo "Removed plots/*";
+rm -rf $ROOT/figures/*;
+echo "Removed figures/*";
 
-rm Rplots.pdf;
+rm $ROOT/Rplots.pdf;
 echo "Removed Rplots.pdf";
 
 echo "All clean!";

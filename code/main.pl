@@ -1,15 +1,30 @@
 #! /usr/bin/perl
 #
+# For best results: This should be run from the root directory of the repo.
+#
+
+
 use v5.14;
 use strict;
 use warnings;
 use diagnostics;
 use feature "switch";
+use Cwd;
 use Statistics::Descriptive;
 
 
 # Var matey!
-my @yeastGenome = glob "../data/YeastGenome-tmp/*";
+#
+# First, find out where we are and set a variable
+# called $ROOT that signifies the root of the repo.
+my $PATH = cwd();
+my $ROOT;
+if ( $PATH =~ /code$/ ) {
+    $ROOT = $PATH =~ s/(code)$//r;
+} else {
+    $ROOT = $PATH . "/";
+}
+my @yeastGenome = glob "$ROOT/data/YeastGenome-tmp/*";
 my $isItCrick   = qr/.{1,}C.aln/;
 my %Saccharomyces = (
     'cerevisiae' => qr/Scer\s{12}([atgcATGC-]{1,})/,
@@ -47,12 +62,13 @@ my %deltaESequences = (
     'rU/rG' => qr/([UT]G)/,
     'rU/rU' => qr/(UU|TT)/
 );
-#my $geneNameRe  = qr/([\d\w]{5,})[.,][\d\w]+/;
+
 my $geneNameRe  = qr/(eY\w{5}[CW])/;
 my $geneRe      = qr/,([atgcATGC-]+)/;
 my $fileTracker = 0;
 # Create a variable for each dinucleotide in the %sequences
-# that I'm interested in
+# that I'm interested in. This will be used later to calculate
+# each dinucleotide's weighted correlation.
 # (for now I have to do this manually)
 my $AA = 0;
 my $AC = 0;
@@ -70,27 +86,7 @@ my $UA = 0;
 my $UC = 0;
 my $UG = 0;
 my $UU = 0;
-# my %sequences = {
-#     'AA' => qr/(AA)/;
-#     'AC' => qr/(AA)/;
-#     'AG' => qr/(AA)/;
-#     'AU' => qr/(AA)/;
-#     'CA' => qr/(AA)/;
-#     'CC' => qr/(AA)/;
-#     'CG' => qr/(AA)/;
-#     'CU' => qr/(AA)/;
-#     'GA' => qr/(AA)/;
-#     'GC' => qr/(AA)/;
-#     'GG' => qr/(AA)/;
-#     'GU' => qr/(AA)/;
-#     'UA' => qr/(AA)/;
-#     'UC' => qr/(AA)/;
-#     'UG' => qr/(AA)/;
-#     'UU' => qr/(AA)/;
-# }
-#for ( my \$keys in %sequences ) {
-#    my @{$keys};
-#}
+
 
 ##### Init main script #####
 
@@ -100,11 +96,10 @@ print "\nInitializing...\n\n";
 # the data files
 foreach my $species (keys %Saccharomyces) {
 
-    mkdir("./data/$species");
-
-    open(FILE, ">", "../data/$species/genome.csv");
-    print FILE "gene,code\n";
-    close FILE;
+    mkdir("$ROOT/data/$species");
+    open(my $genomeFile, ">", "$ROOT/data/$species/genome.csv");
+    print $genomeFile "gene,code\n";
+    close $genomeFile;
 }
 
 print "Currently writing data\n";
@@ -128,14 +123,14 @@ foreach my $fileName (@yeastGenome) {
     # We have to do this now while we have the `$geneName` varialbe available.
     foreach my $species (keys %Saccharomyces) {
 
-        mkdir("../data/$species/$geneName");
+        mkdir("$ROOT/data/$species/$geneName");
 
-        open(my $raw,">../data/$species/$geneName/raw.csv");
+        open(my $raw,">$ROOT/data/$species/$geneName/raw.csv");
             print $raw "gene,dinucleotide,position,trxScore,energyScore\n";
         close $raw;
 
-        open(my $smooth,">./data/$species/$geneName/smooth.csv");
-            print $smooth "gene,position,trxMean,energyMean\n";
+        open(my $smooth,">$ROOT/data/$species/$geneName/smooth.csv");
+            print $smooth "gene,position,trxMean,energyMean,AAcount,ACcount,AGcount,AUcount,CAcount,CCcount,CGcount,CUcount,GAcount,GCcount,GGcount,GUcount,UAcount,UCcount,UGcount,UUcount\n";
         close $smooth;
     }
 
@@ -160,17 +155,17 @@ foreach my $fileName (@yeastGenome) {
                 }
 
                 # Append the data to the species CSV file 
-                open(SPECIES, ">>../data/$species/genome.csv") || die "Cannot open file: $!\n";
-                print SPECIES $line; 
+                open(SPECIES, ">>$ROOT/data/$species/genome.csv") || die "Cannot open file: $!\n";
+                print SPECIES $line;
                 close SPECIES;
-
             }
 
-        my $gattaca = qr/[Gg][Aa][Tt][Tt][Aa][Cc][Aa]/;
-        if ( match($gattaca,$line) ) {
-            open(GATTACA, ">>../data/gattaca.txt");
-            print "\n\n\n====WE HAVE GATTACA====\n$species - $geneName\n$line\n\n\n";
-            close GATTACA;
+            my $gattaca = qr/[Gg][Aa][Tt][Tt][Aa][Cc][Aa]/;
+            if ( match($gattaca,$line) ) {
+                open(GATTACA, ">>$ROOT/data/gattaca.txt");
+                print "\n\n\n====WE HAVE GATTACA====\n$species - $geneName\n$line\n\n\n";
+                close GATTACA;
+            }
         }
     }
 
@@ -193,7 +188,7 @@ print "\nGenomes have been written to CSV files.\nNow calculating TRX and delta-
 # Let's loop through each `$species/genome.csv` and read them straigt away.
 foreach my $species (keys %Saccharomyces) {
 
-    open(SPECIES,"<../data/$species/genome.csv") || die "Cannot open file: $!";
+    open(SPECIES,"<$ROOT/data/$species/genome.csv") || die "Cannot open file: $!";
     my @text = <SPECIES>;
     print "Working on $species right now.\n";
 
@@ -211,12 +206,12 @@ foreach my $species (keys %Saccharomyces) {
             my $gene     = match($geneRe,$line);
 
             # Raw data
-            # 
+            #
             # Calculates the trxValue and energyScore on a per-dinucleotide
             # basis. Then print the data to the respective CSV file in the
             # following format:
             #     gene,dinucleotide,position,trx.score,energy.score
-            open(my $raw, ">>../data/$species/$geneName/raw.csv") || die "Cannot open file: $!";
+            open(my $raw, ">>$ROOT/data/$species/$geneName/raw.csv") || die "Cannot open file: $!";
             for ( my $position = 0; $position < length($gene); $position++ ) {
 
                 my $dinucleotide = substr($gene,$position,2);
@@ -238,7 +233,7 @@ foreach my $species (keys %Saccharomyces) {
             # of the selected data set and outputs it into the respecive `smooth.csv` file 
             # in the following format, to be read later by R's graphing functions:
             #       gene,position,trx.mean,energy.mean
-            open(my $smoothFile, ">>../data/$species/$geneName/smooth.csv") || die "Cannot open file $!";
+            open(my $smoothFile, ">>$ROOT/data/$species/$geneName/smooth.csv") || die "Cannot open file $!";
             my $smoothingWindow = 200;
             my $smoothing = 0;
             # Loop through every 200 characters
@@ -255,29 +250,28 @@ foreach my $species (keys %Saccharomyces) {
                         my $trxValue    = trxScore($dinucleotide);
                         my $energyScore = energyScore($dinucleotide);
 
-                        #print "trxValue = $trxValue\n";
                         push @trxValues, $trxValue;
                         push @energyScores, $energyScore;
 
                         # Now that we've printed the dinucleotide, let's begin calculating the weight
-                        for ( $dinucleotide ) {
-                            $AA++ when /AA/;
-                            $AC++ when /AC/;
-                            $AG++ when /AG/;
-                            $AU++ when /A[UT]/;
-                            $CA++ when /CA/;
-                            $CC++ when /CC/;
-                            $CG++ when /CG/;
-                            $CU++ when /C[UT]/;
-                            $GA++ when /GA/;
-                            $GC++ when /GC/;
-                            $GG++ when /GG/;
-                            $GU++ when /G[UT]/;
-                            $UA++ when /[UT]A/;
-                            $UC++ when /[UT]C/;
-                            $UG++ when /[UT]G/;
-                            $UU++ when /UU|TT/;
-                            default { next; };
+                        given ( $dinucleotide ) {
+                            when ( /AA/ )    { $AA++ }
+                            when ( /AC/ )    { $AC++ }
+                            when ( /AG/ )    { $AG++ }
+                            when ( /A[UT]/ ) { $AU++ }
+                            when ( /CA/ )    { $CA++ }
+                            when ( /CC/ )    { $CC++ }
+                            when ( /CG/ )    { $CG++ }
+                            when ( /C[UT]/ ) { $CU++ }
+                            when ( /GA/ )    { $GA++ }
+                            when ( /GC/ )    { $GC++ }
+                            when ( /GG/ )    { $GG++ }
+                            when ( /G[UT]/ ) { $GU++ }
+                            when ( /[UT]A/ ) { $UA++ }
+                            when ( /[UT]C/ ) { $UC++ }
+                            when ( /[UT]G/ ) { $UG++ }
+                            when ( /UU|TT/ ) { $UU++ }
+                            default          { next; };
                         }
                     }
                 }
@@ -289,10 +283,9 @@ foreach my $species (keys %Saccharomyces) {
 
                 my $energyStat = Statistics::Descriptive::Full->new();
                    $energyStat->add_data(@energyScores);
-                my $energyMean = $energyStat->mean(); 
+                my $energyMean = $energyStat->mean();
 
-                print $smoothFile $geneName . "," . $smoothing . "," . $trxMean . "," . $energyMean . "," . $AA . "," 
-                    $AC . "," . $AG . "," . $AU . "," . $CA . "," . $CC . "," . $CG . "," . $CU . "," . $GA . "," . $GC . "," . $GG . "," . $GU . "," . $UA . "," . $UC . "," . $UG . "," . $UU . "\n";
+                print $smoothFile $geneName . "," . $smoothing . "," . $trxMean . "," . $energyMean . "," . $AA . "," . $AC . "," . $AG . "," . $AU . "," . $CA . "," . $CC . "," . $CG . "," . $CU . "," . $GA . "," . $GC . "," . $GG . "," . $GU . "," . $UA . "," . $UC . "," . $UG . "," . $UU . "\n";
             }
             close $smoothFile;
         }
@@ -347,7 +340,6 @@ sub reverseCompliment {
 # @param $dinucleotide {string} The nucleotide to be checked
 # @return {integer} The TRX value
 sub trxScore {
-   
     my ( $dinucleotide ) = @_;
 
     my %trxScores = (
@@ -426,8 +418,8 @@ sub printToGenome {
 
     foreach my $species (keys %Saccharomyces) {
         # Get the specific gene name from the $fileName
-        open(SPECIES, ">>../data/$species/genome.csv") || die "Cannot open file: $!\n";
-        print SPECIES $str; 
+        open(SPECIES, ">>$ROOT/data/$species/genome.csv") || die "Cannot open file: $!\n";
+        print SPECIES $str;
         close SPECIES;
     }
     return 1;
